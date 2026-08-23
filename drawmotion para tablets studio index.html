@@ -1,0 +1,2706 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>DrawMotion Studio</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  font-family:Arial,sans-serif;
+  background:#15161a;
+  color:#fff;
+}
+
+button,input{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+  user-select:none;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* ================= APP ================= */
+
+#app{
+  width:100%;
+  height:100%;
+  position:relative;
+}
+
+/* ================= MENU ================= */
+
+#home{
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  background:radial-gradient(circle at top,#343650,#15161a 55%);
+}
+
+.homeHeader{
+  padding:20px 25px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.logo{
+  font-size:28px;
+  font-weight:800;
+}
+
+.logo span{
+  color:#8d7cff;
+}
+
+.homeContent{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:25px;
+}
+
+.menu{
+  width:min(900px,95vw);
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:18px;
+}
+
+.menuCard{
+  min-height:145px;
+  border:1px solid #454653;
+  border-radius:22px;
+  background:#24252c;
+  color:#fff;
+  padding:24px;
+  text-align:left;
+  transition:.12s;
+}
+
+.menuCard:active{
+  transform:scale(.97);
+}
+
+.menuIcon{
+  font-size:40px;
+  display:block;
+  margin-bottom:10px;
+}
+
+.menuTitle{
+  font-size:20px;
+  font-weight:bold;
+}
+
+.menuDesc{
+  color:#aaa;
+  margin-top:7px;
+}
+
+.homeFooter{
+  padding:12px;
+  text-align:center;
+  color:#777;
+}
+
+/* ================= EDITOR ================= */
+
+#editor{
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  background:#1a1b1f;
+}
+
+.topbar{
+  height:64px;
+  min-height:64px;
+  background:#24252b;
+  border-bottom:1px solid #41424a;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 10px;
+  overflow-x:auto;
+}
+
+.topBtn{
+  border:0;
+  border-radius:10px;
+  background:#35363e;
+  color:#fff;
+  min-width:48px;
+  height:45px;
+  padding:0 14px;
+}
+
+.topBtn:active,
+.smallBtn:active,
+.toolBtn:active{
+  transform:scale(.94);
+}
+
+.topBtn.primary{
+  background:#725df5;
+}
+
+.projectName{
+  font-weight:bold;
+  margin-right:auto;
+  white-space:nowrap;
+}
+
+/* ================= MAIN ================= */
+
+.editorMain{
+  flex:1;
+  min-height:0;
+  display:flex;
+}
+
+/* ================= TOOLS ================= */
+
+.leftTools{
+  width:84px;
+  min-width:84px;
+  background:#25262c;
+  border-right:1px solid #41424a;
+  padding:8px;
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  overflow:auto;
+}
+
+.toolBtn{
+  width:67px;
+  min-height:58px;
+  border:0;
+  border-radius:12px;
+  background:#35363e;
+  color:#fff;
+  font-size:23px;
+}
+
+.toolBtn small{
+  display:block;
+  font-size:9px;
+  margin-top:2px;
+}
+
+.toolBtn.active{
+  background:#725df5;
+}
+
+/* ================= CENTER ================= */
+
+.center{
+  flex:1;
+  min-width:0;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+}
+
+.canvasTop{
+  height:50px;
+  min-height:50px;
+  background:#222329;
+  border-bottom:1px solid #41424a;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:6px 9px;
+  overflow-x:auto;
+}
+
+.smallBtn{
+  height:37px;
+  min-width:42px;
+  border:0;
+  border-radius:9px;
+  background:#35363e;
+  color:#fff;
+  padding:0 11px;
+  white-space:nowrap;
+}
+
+.canvasArea{
+  flex:1;
+  min-height:0;
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background-color:#292a2e;
+
+  background-image:
+    linear-gradient(45deg,#34353a 25%,transparent 25%),
+    linear-gradient(-45deg,#34353a 25%,transparent 25%),
+    linear-gradient(45deg,transparent 75%,#34353a 75%),
+    linear-gradient(-45deg,transparent 75%,#34353a 75%);
+
+  background-size:28px 28px;
+  background-position:0 0,0 14px,14px -14px,-14px 0;
+}
+
+#canvasWrap{
+  position:relative;
+  width:min(900px,82%);
+  height:min(600px,82%);
+  transform-origin:center;
+  box-shadow:0 15px 45px #0008;
+  background:#fff;
+}
+
+.layerCanvas,
+#previewCanvas{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  touch-action:none;
+  user-select:none;
+}
+
+#previewCanvas{
+  pointer-events:none;
+}
+
+/* ================= RIGHT ================= */
+
+.rightPanel{
+  width:235px;
+  min-width:235px;
+  background:#25262c;
+  border-left:1px solid #41424a;
+  display:flex;
+  flex-direction:column;
+  overflow:auto;
+}
+
+.panelTitle{
+  padding:14px;
+  border-bottom:1px solid #41424a;
+  font-weight:bold;
+}
+
+.panel{
+  padding:13px;
+  border-bottom:1px solid #41424a;
+}
+
+.panel label{
+  display:block;
+  font-size:13px;
+  color:#bbb;
+  margin-bottom:7px;
+}
+
+.range{
+  width:100%;
+}
+
+.value{
+  color:#aaa;
+  font-size:12px;
+  margin-top:5px;
+}
+
+.colorPicker{
+  width:100%;
+  height:43px;
+  border:0;
+  padding:0;
+  background:none;
+}
+
+.palette{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:6px;
+}
+
+.palette button{
+  width:28px;
+  height:28px;
+  border:2px solid #555;
+  border-radius:7px;
+}
+
+.layerList{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.layerItem{
+  padding:9px;
+  background:#35363e;
+  border-radius:9px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.layerItem.active{
+  outline:2px solid #725df5;
+}
+
+.layerItem button{
+  border:0;
+  background:none;
+  color:#fff;
+}
+
+/* ================= TIMELINE ================= */
+
+.timeline{
+  height:105px;
+  min-height:105px;
+  background:#202126;
+  border-top:1px solid #41424a;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:9px;
+  overflow-x:auto;
+}
+
+.frames{
+  display:flex;
+  gap:8px;
+}
+
+.frame{
+  width:75px;
+  height:75px;
+  min-width:75px;
+  border-radius:9px;
+  background:#33343b;
+  border:2px solid transparent;
+  position:relative;
+  overflow:hidden;
+}
+
+.frame.active{
+  border-color:#8d7cff;
+}
+
+.frame img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+.frameNumber{
+  position:absolute;
+  bottom:3px;
+  right:5px;
+  font-size:10px;
+  background:#0009;
+  padding:2px 4px;
+  border-radius:4px;
+}
+
+/* ================= STATUS ================= */
+
+.status{
+  position:absolute;
+  left:10px;
+  bottom:10px;
+  background:#111b;
+  padding:7px 10px;
+  border-radius:8px;
+  color:#ccc;
+  font-size:12px;
+  pointer-events:none;
+}
+
+/* ================= MODAL ================= */
+
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  background:#000b;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+}
+
+.modalBox{
+  width:min(560px,96vw);
+  max-height:90vh;
+  overflow:auto;
+  background:#27282f;
+  border-radius:20px;
+  padding:23px;
+}
+
+.modalBox h2{
+  margin-top:0;
+}
+
+.modalActions{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:18px;
+}
+
+.saveOptions{
+  display:grid;
+  gap:10px;
+}
+
+.saveOption{
+  width:100%;
+  border:1px solid #4a4b55;
+  background:#34353d;
+  color:white;
+  border-radius:13px;
+  padding:16px;
+  text-align:left;
+}
+
+.saveOption:hover{
+  background:#40414a;
+}
+
+.aiBox{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.aiInput{
+  width:100%;
+  min-height:90px;
+  resize:vertical;
+  background:#17181c;
+  color:#fff;
+  border:1px solid #555;
+  border-radius:10px;
+  padding:12px;
+}
+
+.aiAnswer{
+  background:#17181c;
+  border-radius:10px;
+  padding:12px;
+  min-height:55px;
+  color:#ddd;
+  white-space:pre-wrap;
+}
+
+/* ================= RESPONSIVO ================= */
+
+@media(max-width:1000px){
+  .rightPanel{
+    width:205px;
+    min-width:205px;
+  }
+}
+
+@media(max-width:750px){
+  .menu{
+    grid-template-columns:1fr;
+  }
+
+  .rightPanel{
+    display:none;
+  }
+
+  .leftTools{
+    width:72px;
+    min-width:72px;
+  }
+
+  .toolBtn{
+    width:55px;
+  }
+
+  #canvasWrap{
+    width:92%;
+    height:80%;
+  }
+}
+
+@media(max-width:600px){
+
+  .logo{
+    font-size:21px;
+  }
+
+  .homeHeader{
+    padding:15px;
+  }
+
+  .homeContent{
+    padding:15px;
+  }
+
+  .menuCard{
+    min-height:115px;
+  }
+
+  .topbar{
+    height:57px;
+    min-height:57px;
+  }
+
+  .editorMain{
+    flex-direction:column;
+  }
+
+  .leftTools{
+    order:2;
+    width:100%;
+    min-width:0;
+    height:70px;
+    min-height:70px;
+    flex-direction:row;
+    overflow-x:auto;
+    overflow-y:hidden;
+  }
+
+  .toolBtn{
+    min-width:57px;
+    min-height:55px;
+  }
+
+  .center{
+    order:1;
+  }
+
+  .timeline{
+    height:84px;
+    min-height:84px;
+  }
+
+  .frame{
+    width:60px;
+    height:60px;
+    min-width:60px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+<!-- ================= MENU ================= -->
+
+<section id="home">
+
+<header class="homeHeader">
+
+<div class="logo">
+🎨 <span>DrawMotion</span> Studio
+</div>
+
+<button class="topBtn" onclick="openSettings()">⚙️</button>
+
+</header>
+
+<div class="homeContent">
+
+<div class="menu">
+
+<button class="menuCard" onclick="newProject()">
+<span class="menuIcon">🎨</span>
+<div class="menuTitle">Novo desenho</div>
+<div class="menuDesc">Comece um desenho novo.</div>
+</button>
+
+<button class="menuCard" onclick="importFromHome()">
+<span class="menuIcon">🖼️</span>
+<div class="menuTitle">Importar imagem</div>
+<div class="menuDesc">Abra uma imagem para desenhar por cima.</div>
+</button>
+
+<button class="menuCard" onclick="newAnimation()">
+<span class="menuIcon">🎞️</span>
+<div class="menuTitle">Nova animação</div>
+<div class="menuDesc">Crie desenhos usando vários frames.</div>
+</button>
+
+<button class="menuCard" onclick="openLastProject()">
+<span class="menuIcon">📂</span>
+<div class="menuTitle">Continuar</div>
+<div class="menuDesc">Continue seu último projeto salvo.</div>
+</button>
+
+<button class="menuCard" onclick="openDrawAI()">
+<span class="menuIcon">🤖</span>
+<div class="menuTitle">Draw AI</div>
+<div class="menuDesc">Pergunte algo ou mande a IA desenhar.</div>
+</button>
+
+</div>
+</div>
+
+<footer class="homeFooter">
+DrawMotion Studio • Tablet Edition
+</footer>
+
+</section>
+
+
+<!-- ================= EDITOR ================= -->
+
+<section id="editor" class="hidden">
+
+<header class="topbar">
+
+<button class="topBtn" onclick="goHome()">🏠</button>
+
+<div class="projectName" id="projectName">
+Meu desenho
+</div>
+
+<button class="topBtn" onclick="undo()">↩️</button>
+<button class="topBtn" onclick="redo()">↪️</button>
+<button class="topBtn" onclick="importImage()">🖼️</button>
+<button class="topBtn" onclick="openSaveMenu()">💾 Salvar</button>
+<button class="topBtn" onclick="openDrawAI()">🤖 AI</button>
+<button class="topBtn primary" onclick="toggleFullscreen()">⛶</button>
+
+<input
+id="fileInput"
+type="file"
+accept="image/*"
+hidden
+>
+
+</header>
+
+
+<div class="editorMain">
+
+<!-- FERRAMENTAS -->
+
+<aside class="leftTools">
+
+<button class="toolBtn active"
+data-tool="pencil"
+onclick="selectTool('pencil',this)">
+✏️
+<small>Lápis</small>
+</button>
+
+<button class="toolBtn"
+data-tool="brush"
+onclick="selectTool('brush',this)">
+🖌️
+<small>Pincel</small>
+</button>
+
+<button class="toolBtn"
+data-tool="eraser"
+onclick="selectTool('eraser',this)">
+🧽
+<small>Borracha</small>
+</button>
+
+<button class="toolBtn"
+data-tool="line"
+onclick="selectTool('line',this)">
+📏
+<small>Linha</small>
+</button>
+
+<button class="toolBtn"
+data-tool="rect"
+onclick="selectTool('rect',this)">
+⬜
+<small>Quadro</small>
+</button>
+
+<button class="toolBtn"
+data-tool="circle"
+onclick="selectTool('circle',this)">
+⭕
+<small>Círculo</small>
+</button>
+
+<button class="toolBtn"
+data-tool="fill"
+onclick="selectTool('fill',this)">
+🪣
+<small>Balde</small>
+</button>
+
+<button class="toolBtn"
+onclick="clearCurrentLayer()">
+🗑️
+<small>Limpar</small>
+</button>
+
+</aside>
+
+
+<!-- CENTRO -->
+
+<main class="center">
+
+<div class="canvasTop">
+
+<button class="smallBtn" onclick="zoomIn()">＋</button>
+<button class="smallBtn" onclick="zoomOut()">−</button>
+<button class="smallBtn" onclick="resetZoom()">100%</button>
+<button class="smallBtn" onclick="rotateCanvas()">🔄</button>
+<button class="smallBtn" onclick="toggleTransparent()">♢ Fundo</button>
+<button class="smallBtn" onclick="addLayer()">＋ Camada</button>
+<button class="smallBtn" onclick="openDrawAI()">🤖 Draw AI</button>
+
+</div>
+
+
+<div class="canvasArea">
+
+<div id="canvasWrap">
+
+<canvas
+id="previewCanvas"
+width="1200"
+height="800">
+</canvas>
+
+</div>
+
+<div class="status" id="status">
+Lápis • 8px
+</div>
+
+</div>
+
+
+<!-- TIMELINE -->
+
+<div class="timeline">
+
+<button class="smallBtn" onclick="addFrame()">
+＋ Frame
+</button>
+
+<button class="smallBtn" onclick="playAnimation()">
+▶️
+</button>
+
+<button class="smallBtn" onclick="stopAnimation()">
+⏹️
+</button>
+
+<div class="frames" id="frames"></div>
+
+</div>
+
+</main>
+
+
+<!-- PAINEL -->
+
+<aside class="rightPanel">
+
+<div class="panelTitle">
+🎨 Propriedades
+</div>
+
+<div class="panel">
+
+<label>Tamanho do pincel</label>
+
+<input
+id="brushSize"
+class="range"
+type="range"
+min="1"
+max="100"
+value="8"
+oninput="changeSize(this.value)"
+>
+
+<div class="value" id="sizeText">8 px</div>
+
+</div>
+
+<div class="panel">
+
+<label>Cor</label>
+
+<input
+id="colorPicker"
+class="colorPicker"
+type="color"
+value="#111111"
+onchange="changeColor(this.value)"
+>
+
+</div>
+
+<div class="panel">
+
+<label>Paleta</label>
+
+<div class="palette">
+
+<button style="background:#000" onclick="changeColor('#000000')"></button>
+<button style="background:#fff" onclick="changeColor('#ffffff')"></button>
+<button style="background:#ff0000" onclick="changeColor('#ff0000')"></button>
+<button style="background:#ff6600" onclick="changeColor('#ff6600')"></button>
+<button style="background:#ffd000" onclick="changeColor('#ffd000')"></button>
+<button style="background:#00cc55" onclick="changeColor('#00cc55')"></button>
+<button style="background:#00aaff" onclick="changeColor('#00aaff')"></button>
+<button style="background:#4455ff" onclick="changeColor('#4455ff')"></button>
+<button style="background:#7700ff" onclick="changeColor('#7700ff')"></button>
+<button style="background:#ff00aa" onclick="changeColor('#ff00aa')"></button>
+<button style="background:#8b4513" onclick="changeColor('#8b4513')"></button>
+<button style="background:#808080" onclick="changeColor('#808080')"></button>
+
+</div>
+</div>
+
+<div class="panel">
+
+<label>Camadas</label>
+
+<div class="layerList" id="layerList"></div>
+
+</div>
+
+<div class="panel">
+
+<label>Animação</label>
+
+<input
+id="fps"
+class="range"
+type="range"
+min="1"
+max="30"
+value="12"
+>
+
+<div class="value">
+FPS: <span id="fpsValue">12</span>
+</div>
+
+</div>
+
+</aside>
+
+</div>
+
+</section>
+
+
+<!-- ================= MODAL ================= -->
+
+<div id="modal" class="modal hidden">
+
+<div class="modalBox">
+
+<h2 id="modalTitle">DrawMotion</h2>
+
+<div id="modalContent"></div>
+
+<div class="modalActions">
+
+<button class="topBtn" onclick="closeModal()">
+Cancelar
+</button>
+
+<button class="topBtn primary" id="modalOK">
+OK
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   CONFIG
+===================================================== */
+
+const W = 1200;
+const H = 800;
+
+let currentTool = "pencil";
+let currentColor = "#111111";
+let brushSize = 8;
+
+let transparentBackground = false;
+
+let zoom = 1;
+let rotation = 0;
+
+let drawing = false;
+
+let startX = 0;
+let startY = 0;
+
+let undoStack = [];
+let redoStack = [];
+
+let layers = [];
+let activeLayer = 0;
+
+let frames = [];
+let activeFrame = 0;
+
+let animationTimer = null;
+
+let projectName = "Meu desenho";
+
+
+/* =====================================================
+   ELEMENTOS
+===================================================== */
+
+const home = document.getElementById("home");
+const editor = document.getElementById("editor");
+const canvasWrap = document.getElementById("canvasWrap");
+const preview = document.getElementById("previewCanvas");
+const previewCtx = preview.getContext("2d");
+const layerList = document.getElementById("layerList");
+const framesElement = document.getElementById("frames");
+const statusElement = document.getElementById("status");
+
+
+/* =====================================================
+   MENU
+===================================================== */
+
+function newProject(){
+
+projectName="Meu desenho";
+
+document.getElementById("projectName").textContent=projectName;
+
+startEditor(false);
+
+}
+
+
+function newAnimation(){
+
+projectName="Minha animação";
+
+document.getElementById("projectName").textContent=projectName;
+
+startEditor(true);
+
+}
+
+
+function startEditor(animation){
+
+home.classList.add("hidden");
+editor.classList.remove("hidden");
+
+initializeProject();
+
+if(animation){
+
+addFrame();
+
+}
+
+}
+
+
+function goHome(){
+
+stopAnimation();
+
+editor.classList.add("hidden");
+home.classList.remove("hidden");
+
+}
+
+
+/* =====================================================
+   PROJETO
+===================================================== */
+
+function initializeProject(){
+
+canvasWrap.querySelectorAll(".layerCanvas").forEach(c=>c.remove());
+
+layers=[];
+activeLayer=0;
+
+frames=[];
+activeFrame=0;
+
+undoStack=[];
+redoStack=[];
+
+createLayer("Camada 1");
+
+renderLayers();
+
+fillBackground();
+
+createFrameFromCurrent();
+
+renderFrames();
+
+}
+
+
+/* =====================================================
+   CAMADAS
+===================================================== */
+
+function createLayer(name){
+
+const canvas=document.createElement("canvas");
+
+canvas.width=W;
+canvas.height=H;
+
+canvas.className="layerCanvas";
+
+canvas.id="layerCanvas_"+layers.length;
+
+canvasWrap.insertBefore(canvas,preview);
+
+const ctx=canvas.getContext("2d");
+
+ctx.lineCap="round";
+ctx.lineJoin="round";
+
+layers.push({
+name:name,
+canvas:canvas,
+ctx:ctx,
+visible:true
+});
+
+/* IMPORTANTE:
+   Cada camada recebe seus próprios eventos.
+   Isso corrige o problema de não conseguir desenhar.
+*/
+
+installCanvasEvents(canvas);
+
+updateLayerVisibility();
+
+}
+
+
+function addLayer(){
+
+createLayer("Camada "+(layers.length+1));
+
+activeLayer=layers.length-1;
+
+renderLayers();
+
+}
+
+
+function renderLayers(){
+
+layerList.innerHTML="";
+
+layers.forEach((layer,index)=>{
+
+const item=document.createElement("div");
+
+item.className="layerItem "+(
+index===activeLayer ? "active":""
+);
+
+const name=document.createElement("span");
+
+name.textContent=layer.name;
+
+const buttons=document.createElement("div");
+
+const select=document.createElement("button");
+
+select.textContent="●";
+
+select.onclick=()=>{
+
+activeLayer=index;
+
+renderLayers();
+
+};
+
+
+const visibility=document.createElement("button");
+
+visibility.textContent=layer.visible ? "👁️":"🚫";
+
+visibility.onclick=()=>{
+
+layer.visible=!layer.visible;
+
+updateLayerVisibility();
+
+renderLayers();
+
+};
+
+buttons.appendChild(select);
+buttons.appendChild(visibility);
+
+item.appendChild(name);
+item.appendChild(buttons);
+
+layerList.appendChild(item);
+
+});
+
+}
+
+
+function updateLayerVisibility(){
+
+layers.forEach(layer=>{
+
+layer.canvas.style.display=
+layer.visible ? "block":"none";
+
+});
+
+}
+
+
+function getActiveCtx(){
+
+return layers[activeLayer].ctx;
+
+}
+
+
+function getActiveCanvas(){
+
+return layers[activeLayer].canvas;
+
+}
+
+
+/* =====================================================
+   FUNDO
+===================================================== */
+
+function fillBackground(){
+
+const ctx=getActiveCtx();
+
+ctx.clearRect(0,0,W,H);
+
+if(!transparentBackground){
+
+ctx.fillStyle="#ffffff";
+
+ctx.fillRect(0,0,W,H);
+
+}
+
+}
+
+
+function toggleTransparent(){
+
+transparentBackground=!transparentBackground;
+
+if(!transparentBackground){
+
+const ctx=getActiveCtx();
+
+ctx.save();
+
+ctx.globalCompositeOperation="destination-over";
+
+ctx.fillStyle="#ffffff";
+
+ctx.fillRect(0,0,W,H);
+
+ctx.restore();
+
+}
+
+updateStatus();
+
+}
+
+
+/* =====================================================
+   FERRAMENTAS
+===================================================== */
+
+function selectTool(tool,button){
+
+currentTool=tool;
+
+document.querySelectorAll(".toolBtn")
+.forEach(btn=>btn.classList.remove("active"));
+
+if(button)button.classList.add("active");
+
+updateStatus();
+
+}
+
+
+function updateStatus(){
+
+const names={
+pencil:"Lápis",
+brush:"Pincel",
+eraser:"Borracha",
+line:"Linha",
+rect:"Retângulo",
+circle:"Círculo",
+fill:"Balde"
+};
+
+statusElement.textContent=
+`${names[currentTool]} • ${brushSize}px`;
+
+}
+
+
+function changeColor(value){
+
+currentColor=value;
+
+document.getElementById("colorPicker").value=value;
+
+}
+
+
+function changeSize(value){
+
+brushSize=Number(value);
+
+document.getElementById("sizeText").textContent=
+brushSize+" px";
+
+updateStatus();
+
+}
+
+
+/* =====================================================
+   COORDENADAS
+===================================================== */
+
+function getPosition(event){
+
+const canvas=getActiveCanvas();
+
+const rect=canvas.getBoundingClientRect();
+
+let clientX;
+let clientY;
+
+if(event.clientX!==undefined){
+
+clientX=event.clientX;
+clientY=event.clientY;
+
+}else if(event.touches && event.touches.length){
+
+clientX=event.touches[0].clientX;
+clientY=event.touches[0].clientY;
+
+}else{
+
+return {x:0,y:0};
+
+}
+
+return{
+
+x:(clientX-rect.left)*W/rect.width,
+
+y:(clientY-rect.top)*H/rect.height
+
+};
+
+}
+
+
+/* =====================================================
+   DESENHO
+===================================================== */
+
+function startDrawing(event){
+
+if(event.pointerType==="mouse" && event.button!==0)return;
+
+event.preventDefault();
+
+try{
+event.currentTarget.setPointerCapture(event.pointerId);
+}catch(e){}
+
+const pos=getPosition(event);
+
+startX=pos.x;
+startY=pos.y;
+
+drawing=true;
+
+saveState();
+
+const ctx=getActiveCtx();
+
+if(currentTool==="fill"){
+
+floodFill(
+Math.floor(startX),
+Math.floor(startY)
+);
+
+drawing=false;
+
+return;
+
+}
+
+if(
+currentTool==="pencil" ||
+currentTool==="brush" ||
+currentTool==="eraser"
+){
+
+ctx.beginPath();
+
+ctx.moveTo(startX,startY);
+
+drawDot(ctx,startX,startY);
+
+}
+
+}
+
+
+function drawDot(ctx,x,y){
+
+if(currentTool==="eraser"){
+
+ctx.save();
+
+ctx.globalCompositeOperation="destination-out";
+
+ctx.beginPath();
+
+ctx.arc(
+x,
+y,
+brushSize,
+0,
+Math.PI*2
+);
+
+ctx.fill();
+
+ctx.restore();
+
+return;
+
+}
+
+ctx.save();
+
+ctx.globalCompositeOperation="source-over";
+
+ctx.fillStyle=currentColor;
+
+ctx.beginPath();
+
+const radius=
+currentTool==="brush"
+? brushSize
+: brushSize/2;
+
+ctx.arc(
+x,
+y,
+Math.max(1,radius),
+0,
+Math.PI*2
+);
+
+ctx.fill();
+
+ctx.restore();
+
+}
+
+
+function draw(event){
+
+if(!drawing)return;
+
+event.preventDefault();
+
+const pos=getPosition(event);
+
+const x=pos.x;
+const y=pos.y;
+
+const ctx=getActiveCtx();
+
+if(
+currentTool==="pencil" ||
+currentTool==="brush" ||
+currentTool==="eraser"
+){
+
+ctx.lineCap="round";
+ctx.lineJoin="round";
+
+if(currentTool==="pencil"){
+
+ctx.lineWidth=brushSize;
+
+ctx.globalCompositeOperation="source-over";
+ctx.strokeStyle=currentColor;
+
+}
+
+if(currentTool==="brush"){
+
+ctx.lineWidth=brushSize*2;
+
+ctx.globalCompositeOperation="source-over";
+ctx.strokeStyle=currentColor;
+
+}
+
+if(currentTool==="eraser"){
+
+ctx.lineWidth=brushSize*2;
+
+ctx.globalCompositeOperation="destination-out";
+
+}
+
+ctx.lineTo(x,y);
+ctx.stroke();
+
+return;
+
+}
+
+
+previewCtx.clearRect(0,0,W,H);
+
+previewCtx.strokeStyle=currentColor;
+previewCtx.lineWidth=brushSize;
+previewCtx.lineCap="round";
+
+if(currentTool==="line"){
+
+previewCtx.beginPath();
+
+previewCtx.moveTo(startX,startY);
+
+previewCtx.lineTo(x,y);
+
+previewCtx.stroke();
+
+}
+
+
+if(currentTool==="rect"){
+
+previewCtx.strokeRect(
+startX,
+startY,
+x-startX,
+y-startY
+);
+
+}
+
+
+if(currentTool==="circle"){
+
+const dx=x-startX;
+const dy=y-startY;
+
+const radius=Math.sqrt(dx*dx+dy*dy);
+
+previewCtx.beginPath();
+
+previewCtx.arc(
+startX,
+startY,
+radius,
+0,
+Math.PI*2
+);
+
+previewCtx.stroke();
+
+}
+
+}
+
+
+function stopDrawing(event){
+
+if(!drawing)return;
+
+drawing=false;
+
+const ctx=getActiveCtx();
+
+if(
+currentTool==="line" ||
+currentTool==="rect" ||
+currentTool==="circle"
+){
+
+ctx.drawImage(preview,0,0);
+
+previewCtx.clearRect(0,0,W,H);
+
+}
+
+ctx.globalCompositeOperation="source-over";
+
+try{
+event.currentTarget.releasePointerCapture(event.pointerId);
+}catch(e){}
+
+}
+
+
+/* =====================================================
+   EVENTOS DO CANVAS
+===================================================== */
+
+function installCanvasEvents(canvas){
+
+canvas.addEventListener(
+"pointerdown",
+startDrawing,
+{passive:false}
+);
+
+canvas.addEventListener(
+"pointermove",
+draw,
+{passive:false}
+);
+
+canvas.addEventListener(
+"pointerup",
+stopDrawing,
+{passive:false}
+);
+
+canvas.addEventListener(
+"pointercancel",
+stopDrawing,
+{passive:false}
+);
+
+canvas.addEventListener(
+"pointerleave",
+stopDrawing,
+{passive:false}
+);
+
+}
+
+
+/* =====================================================
+   UNDO / REDO
+===================================================== */
+
+function snapshot(){
+
+return layers.map(layer=>
+layer.ctx.getImageData(0,0,W,H)
+);
+
+}
+
+
+function saveState(){
+
+undoStack.push(snapshot());
+
+if(undoStack.length>30){
+
+undoStack.shift();
+
+}
+
+redoStack=[];
+
+}
+
+
+function restoreSnapshot(data){
+
+data.forEach((image,index)=>{
+
+if(layers[index]){
+
+layers[index].ctx.putImageData(
+image,
+0,
+0
+);
+
+}
+
+});
+
+}
+
+
+function undo(){
+
+if(!undoStack.length)return;
+
+redoStack.push(snapshot());
+
+restoreSnapshot(
+undoStack.pop()
+);
+
+}
+
+
+function redo(){
+
+if(!redoStack.length)return;
+
+undoStack.push(snapshot());
+
+restoreSnapshot(
+redoStack.pop()
+);
+
+}
+
+
+/* =====================================================
+   LIMPAR
+===================================================== */
+
+function clearCurrentLayer(){
+
+saveState();
+
+getActiveCtx().clearRect(
+0,0,W,H
+);
+
+}
+
+
+/* =====================================================
+   BALDE
+===================================================== */
+
+function floodFill(x,y){
+
+const ctx=getActiveCtx();
+
+const image=ctx.getImageData(
+0,0,W,H
+);
+
+const data=image.data;
+
+const index=(y*W+x)*4;
+
+const target=[
+data[index],
+data[index+1],
+data[index+2],
+data[index+3]
+];
+
+const fill=hexToRGBA(currentColor);
+
+if(
+target[0]===fill[0] &&
+target[1]===fill[1] &&
+target[2]===fill[2] &&
+target[3]===fill[3]
+)return;
+
+const queue=[[x,y]];
+
+const visited=new Uint8Array(W*H);
+
+while(queue.length){
+
+const point=queue.pop();
+
+const cx=point[0];
+const cy=point[1];
+
+if(
+cx<0 ||
+cy<0 ||
+cx>=W ||
+cy>=H
+)continue;
+
+const p=cy*W+cx;
+
+if(visited[p])continue;
+
+const i=p*4;
+
+if(
+data[i]!==target[0] ||
+data[i+1]!==target[1] ||
+data[i+2]!==target[2] ||
+data[i+3]!==target[3]
+)continue;
+
+visited[p]=1;
+
+data[i]=fill[0];
+data[i+1]=fill[1];
+data[i+2]=fill[2];
+data[i+3]=fill[3];
+
+queue.push(
+[cx+1,cy],
+[cx-1,cy],
+[cx,cy+1],
+[cx,cy-1]
+);
+
+}
+
+ctx.putImageData(image,0,0);
+
+}
+
+
+function hexToRGBA(hex){
+
+hex=hex.replace("#","");
+
+if(hex.length===3){
+
+hex=hex.split("")
+.map(x=>x+x)
+.join("");
+
+}
+
+return[
+parseInt(hex.slice(0,2),16),
+parseInt(hex.slice(2,4),16),
+parseInt(hex.slice(4,6),16),
+255
+];
+
+}
+
+
+/* =====================================================
+   IMPORTAR
+===================================================== */
+
+function importImage(){
+
+document.getElementById("fileInput").click();
+
+}
+
+
+function importFromHome(){
+
+home.classList.add("hidden");
+editor.classList.remove("hidden");
+
+initializeProject();
+
+document.getElementById("fileInput").click();
+
+}
+
+
+document.getElementById("fileInput")
+.addEventListener("change",loadImportedImage);
+
+
+function loadImportedImage(event){
+
+const file=event.target.files[0];
+
+if(!file)return;
+
+const img=new Image();
+
+const url=URL.createObjectURL(file);
+
+img.onload=()=>{
+
+saveState();
+
+const ctx=getActiveCtx();
+
+ctx.clearRect(0,0,W,H);
+
+const scale=Math.min(
+W/img.width,
+H/img.height
+);
+
+const width=img.width*scale;
+const height=img.height*scale;
+
+ctx.drawImage(
+img,
+(W-width)/2,
+(H-height)/2,
+width,
+height
+);
+
+URL.revokeObjectURL(url);
+
+event.target.value="";
+
+};
+
+img.src=url;
+
+}
+
+
+/* =====================================================
+   MESCLAR CAMADAS
+===================================================== */
+
+function mergeCanvas(options={}){
+
+const output=document.createElement("canvas");
+
+output.width=W;
+output.height=H;
+
+const ctx=output.getContext("2d");
+
+if(!options.transparent){
+
+ctx.fillStyle="#fff";
+
+ctx.fillRect(0,0,W,H);
+
+}
+
+layers.forEach(layer=>{
+
+if(layer.visible){
+
+ctx.drawImage(
+layer.canvas,
+0,
+0
+);
+
+}
+
+});
+
+return output;
+
+}
+
+
+/* =====================================================
+   SALVAR
+===================================================== */
+
+function openSaveMenu(){
+
+openModal(
+"💾 Salvar desenho",
+
+`
+<div class="saveOptions">
+
+<button class="saveOption"
+onclick="saveTransparentPNG();closeModal()">
+<b>🖼️ PNG sem fundo</b><br>
+<small>Salva o desenho com fundo transparente.</small>
+</button>
+
+<button class="saveOption"
+onclick="saveNormalImage();closeModal()">
+<b>💾 Salvar como imagem</b><br>
+<small>Salva o desenho com fundo branco.</small>
+</button>
+
+<button class="saveOption"
+onclick="saveAsFrame();closeModal()">
+<b>🎞️ Guardar como quadro</b><br>
+<small>Adiciona este desenho aos quadros da animação.</small>
+</button>
+
+</div>
+`,
+()=>closeModal()
+);
+
+}
+
+
+function downloadCanvas(canvas,name){
+
+const link=document.createElement("a");
+
+link.download=name;
+
+link.href=canvas.toDataURL("image/png");
+
+document.body.appendChild(link);
+
+link.click();
+
+link.remove();
+
+}
+
+
+function saveTransparentPNG(){
+
+const output=mergeCanvas({
+transparent:true
+});
+
+downloadCanvas(
+output,
+"DrawMotion-sem-fundo.png"
+);
+
+saveProject();
+
+}
+
+
+function saveNormalImage(){
+
+const output=mergeCanvas({
+transparent:false
+});
+
+downloadCanvas(
+output,
+"DrawMotion.png"
+);
+
+saveProject();
+
+}
+
+
+function saveAsFrame(){
+
+const output=mergeCanvas({
+transparent:true
+});
+
+frames.push(
+output.toDataURL("image/png")
+);
+
+activeFrame=frames.length-1;
+
+renderFrames();
+
+saveProject();
+
+alert(
+"Quadro guardado! Ele apareceu na timeline."
+);
+
+}
+
+
+function saveProject(){
+
+try{
+
+const output=mergeCanvas({
+transparent:true
+});
+
+localStorage.setItem(
+"drawmotion-project",
+JSON.stringify({
+image:output.toDataURL("image/png"),
+name:projectName
+})
+);
+
+}catch(e){
+
+console.log(e);
+
+}
+
+}
+
+
+function openLastProject(){
+
+const saved=
+localStorage.getItem("drawmotion-project");
+
+if(!saved){
+
+alert("Nenhum projeto salvo encontrado.");
+
+return;
+
+}
+
+try{
+
+const data=JSON.parse(saved);
+
+startEditor(false);
+
+if(data.name){
+
+projectName=data.name;
+
+document.getElementById(
+"projectName"
+).textContent=projectName;
+
+}
+
+if(data.image){
+
+const img=new Image();
+
+img.onload=()=>{
+
+const ctx=getActiveCtx();
+
+ctx.clearRect(0,0,W,H);
+
+ctx.drawImage(img,0,0,W,H);
+
+frames=[];
+
+createFrameFromCurrent();
+
+renderFrames();
+
+};
+
+img.src=data.image;
+
+}
+
+}catch(e){
+
+alert("Não foi possível abrir o projeto.");
+
+}
+
+}
+
+
+/* =====================================================
+   FRAMES
+===================================================== */
+
+function createFrameFromCurrent(){
+
+const image=mergeCanvas({
+transparent:true
+});
+
+frames.push(
+image.toDataURL("image/png")
+);
+
+}
+
+
+function addFrame(){
+
+createFrameFromCurrent();
+
+activeFrame=frames.length-1;
+
+renderFrames();
+
+}
+
+
+function renderFrames(){
+
+framesElement.innerHTML="";
+
+frames.forEach((src,index)=>{
+
+const frame=document.createElement("div");
+
+frame.className=
+"frame "+
+(index===activeFrame ? "active":"");
+
+const img=document.createElement("img");
+
+img.src=src;
+
+const number=document.createElement("div");
+
+number.className="frameNumber";
+
+number.textContent=index+1;
+
+frame.appendChild(img);
+frame.appendChild(number);
+
+frame.onclick=()=>selectFrame(index);
+
+framesElement.appendChild(frame);
+
+});
+
+}
+
+
+function selectFrame(index){
+
+activeFrame=index;
+
+if(!frames[index])return;
+
+const img=new Image();
+
+img.onload=()=>{
+
+const ctx=getActiveCtx();
+
+ctx.clearRect(0,0,W,H);
+
+ctx.drawImage(
+img,
+0,
+0,
+W,
+H
+);
+
+renderFrames();
+
+};
+
+img.src=frames[index];
+
+}
+
+
+/* =====================================================
+   ANIMAÇÃO
+===================================================== */
+
+function playAnimation(){
+
+if(frames.length<2){
+
+alert("Crie pelo menos 2 quadros.");
+
+return;
+
+}
+
+stopAnimation();
+
+const fps=
+Number(document.getElementById("fps").value);
+
+let index=0;
+
+animationTimer=setInterval(()=>{
+
+selectFrame(index);
+
+index++;
+
+if(index>=frames.length){
+
+index=0;
+
+}
+
+},1000/fps);
+
+}
+
+
+function stopAnimation(){
+
+if(animationTimer){
+
+clearInterval(animationTimer);
+
+animationTimer=null;
+
+}
+
+}
+
+
+document.getElementById("fps")
+.addEventListener("input",function(){
+
+document.getElementById("fpsValue").textContent=
+this.value;
+
+});
+
+
+/* =====================================================
+   ZOOM / ROTAÇÃO
+===================================================== */
+
+function updateTransform(){
+
+canvasWrap.style.transform=
+`scale(${zoom}) rotate(${rotation}deg)`;
+
+}
+
+
+function zoomIn(){
+
+zoom=Math.min(3,zoom+0.1);
+
+updateTransform();
+
+}
+
+
+function zoomOut(){
+
+zoom=Math.max(.3,zoom-.1);
+
+updateTransform();
+
+}
+
+
+function resetZoom(){
+
+zoom=1;
+
+updateTransform();
+
+}
+
+
+function rotateCanvas(){
+
+rotation+=90;
+
+if(rotation>=360)rotation=0;
+
+updateTransform();
+
+}
+
+
+/* =====================================================
+   TELA CHEIA
+===================================================== */
+
+function toggleFullscreen(){
+
+if(!document.fullscreenElement){
+
+document.documentElement.requestFullscreen?.();
+
+}else{
+
+document.exitFullscreen?.();
+
+}
+
+}
+
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+function openModal(title,content,ok){
+
+document.getElementById("modalTitle").textContent=title;
+
+document.getElementById("modalContent").innerHTML=content;
+
+document.getElementById("modal").classList.remove("hidden");
+
+document.getElementById("modalOK").onclick=ok;
+
+}
+
+
+function closeModal(){
+
+document.getElementById("modal").classList.add("hidden");
+
+}
+
+
+/* =====================================================
+   CONFIGURAÇÕES
+===================================================== */
+
+function openSettings(){
+
+openModal(
+"⚙️ Configurações",
+
+`
+<p><b>DrawMotion Studio</b></p>
+
+<p>Versão Tablet</p>
+
+<p style="color:#aaa">
+Desenho compatível com mouse, toque e caneta.
+</p>
+
+<p style="color:#aaa">
+Tudo nesta versão funciona dentro de um único HTML.
+</p>
+`,
+closeModal
+);
+
+}
+
+
+/* =====================================================
+   DRAW AI
+===================================================== */
+
+function openDrawAI(){
+
+openModal(
+"🤖 Draw AI",
+
+`
+<div class="aiBox">
+
+<p>
+<b>Olá! Eu sou o Draw AI.</b><br>
+Posso responder perguntas simples e executar comandos
+básicos de desenho.
+</p>
+
+<textarea
+id="aiInput"
+class="aiInput"
+placeholder="Exemplo: desenhe um círculo vermelho no centro
+ou
+O que é uma camada?"
+></textarea>
+
+<button
+class="topBtn primary"
+onclick="runDrawAI()">
+✨ Executar Draw AI
+</button>
+
+<div id="aiAnswer" class="aiAnswer">
+Digite alguma coisa acima.
+</div>
+
+</div>
+`,
+closeModal
+);
+
+}
+
+
+function runDrawAI(){
+
+const input=
+document.getElementById("aiInput").value
+.trim()
+.toLowerCase();
+
+const answer=
+document.getElementById("aiAnswer");
+
+if(!input){
+
+answer.textContent="Digite uma pergunta ou comando.";
+
+return;
+
+}
+
+
+/* DESENHAR CÍRCULO */
+
+if(
+input.includes("círculo") ||
+input.includes("circulo")
+){
+
+saveState();
+
+const ctx=getActiveCtx();
+
+let color=currentColor;
+
+if(input.includes("vermelho"))color="#ff0000";
+if(input.includes("azul"))color="#0088ff";
+if(input.includes("verde"))color="#00bb55";
+if(input.includes("amarelo"))color="#ffd000";
+if(input.includes("roxo"))color="#7700ff";
+if(input.includes("rosa"))color="#ff00aa";
+if(input.includes("preto"))color="#000000";
+
+ctx.save();
+
+ctx.strokeStyle=color;
+ctx.lineWidth=brushSize;
+
+ctx.beginPath();
+
+ctx.arc(
+W/2,
+H/2,
+150,
+0,
+Math.PI*2
+);
+
+ctx.stroke();
+
+ctx.restore();
+
+answer.textContent=
+"Pronto! Desenhei um círculo no centro do quadro.";
+
+return;
+
+}
+
+
+/* DESENHAR QUADRADO */
+
+if(
+input.includes("quadrado") ||
+input.includes("retângulo") ||
+input.includes("retangulo")
+){
+
+saveState();
+
+const ctx=getActiveCtx();
+
+let color=currentColor;
+
+if(input.includes("vermelho"))color="#ff0000";
+if(input.includes("azul"))color="#0088ff";
+if(input.includes("verde"))color="#00bb55";
+if(input.includes("amarelo"))color="#ffd000";
+
+ctx.save();
+
+ctx.strokeStyle=color;
+ctx.lineWidth=brushSize;
+
+ctx.strokeRect(
+W/2-180,
+H/2-120,
+360,
+240
+);
+
+ctx.restore();
+
+answer.textContent=
+"Pronto! Desenhei um quadrado/retângulo no centro.";
+
+return;
+
+}
+
+
+/* DESENHAR LINHA */
+
+if(input.includes("linha")){
+
+saveState();
+
+const ctx=getActiveCtx();
+
+ctx.save();
+
+ctx.strokeStyle=currentColor;
+ctx.lineWidth=brushSize;
+ctx.lineCap="round";
+
+ctx.beginPath();
+
+ctx.moveTo(250,H/2);
+ctx.lineTo(950,H/2);
+
+ctx.stroke();
+
+ctx.restore();
+
+answer.textContent=
+"Pronto! Desenhei uma linha no quadro.";
+
+return;
+
+}
+
+
+/* LIMPAR */
+
+if(
+input.includes("limpar") ||
+input.includes("apagar tudo")
+){
+
+clearCurrentLayer();
+
+answer.textContent=
+"Pronto! Limpei a camada atual.";
+
+return;
+
+}
+
+
+/* PERGUNTAS */
+
+if(
+input.includes("o que é camada") ||
+input.includes("o que e camada")
+){
+
+answer.textContent=
+"Uma camada é como uma folha transparente. Você pode desenhar em uma camada sem modificar diretamente as outras.";
+
+return;
+
+}
+
+
+if(
+input.includes("como salvar") ||
+input.includes("salvar")
+){
+
+answer.textContent=
+"Toque em 💾 Salvar. Depois escolha PNG sem fundo, Salvar como imagem ou Guardar como quadro.";
+
+return;
+
+}
+
+
+if(
+input.includes("como desenhar")
+){
+
+answer.textContent=
+"Escolha Lápis ou Pincel na barra de ferramentas e arraste o dedo, a caneta ou o mouse sobre o quadro.";
+
+return;
+
+}
+
+
+/* RESPOSTA PADRÃO */
+
+answer.textContent=
+"Posso ajudar com o DrawMotion. Experimente comandos como:\n\n"+
+"• desenhe um círculo vermelho\n"+
+"• desenhe um quadrado azul\n"+
+"• desenhe uma linha\n"+
+"• limpe o desenho\n"+
+"• o que é camada?\n"+
+"• como salvar?";
+
+}
+
+
+/* =====================================================
+   TAMANHO
+===================================================== */
+
+function resizeCanvasDialog(){
+
+openModal(
+"📐 Tamanho do quadro",
+
+`
+<p>O quadro atual é <b>1200 × 800</b>.</p>
+
+<p style="color:#aaa">
+Nesta versão o tamanho interno é fixo para manter
+as camadas e os frames funcionando corretamente.
+</p>
+`,
+closeModal
+);
+
+}
+
+</script>
+
+</body>
+</html>
