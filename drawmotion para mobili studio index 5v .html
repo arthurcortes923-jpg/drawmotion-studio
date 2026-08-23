@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
+<title>DrawMotion Studio Mobile</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#15161a;
+  color:white;
+  font-family:Arial,sans-serif;
+}
+
+button,input{
+  font:inherit;
+}
+
+button{
+  border:0;
+  color:white;
+  background:#303139;
+  border-radius:10px;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* ================= MENU ================= */
+
+#home{
+  width:100%;
+  height:100%;
+  overflow:auto;
+  background:linear-gradient(160deg,#30304a,#15161a);
+}
+
+.header{
+  height:58px;
+  padding:10px 14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.logo{
+  font-size:20px;
+  font-weight:bold;
+}
+
+.logo span{
+  color:#8d7cff;
+}
+
+.home{
+  padding:15px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.card{
+  min-height:125px;
+  padding:16px;
+  text-align:left;
+  background:#25262d;
+  border:1px solid #41424b;
+  border-radius:18px;
+}
+
+.card:active{
+  transform:scale(.97);
+}
+
+.icon{
+  font-size:32px;
+}
+
+.card b{
+  display:block;
+  font-size:17px;
+  margin-top:8px;
+}
+
+.card small{
+  display:block;
+  color:#aaa;
+  margin-top:5px;
+}
+
+/* ================= EDITOR ================= */
+
+#editor{
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+}
+
+.top{
+  height:52px;
+  min-height:52px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:6px;
+  background:#24252b;
+  border-bottom:1px solid #41424a;
+  overflow-x:auto;
+}
+
+.top button{
+  min-width:40px;
+  height:40px;
+  padding:0 10px;
+}
+
+.name{
+  flex:1;
+  min-width:80px;
+  text-align:center;
+  font-weight:bold;
+  white-space:nowrap;
+}
+
+/* ================= ÁREA ================= */
+
+.work{
+  flex:1;
+  min-height:0;
+  position:relative;
+  background:#292a2e;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+#canvasBox{
+  position:relative;
+  width:94vw;
+  height:62vh;
+  max-width:1000px;
+  max-height:750px;
+  background:white;
+  box-shadow:0 8px 30px #0008;
+  transform-origin:center;
+}
+
+.drawCanvas,
+#preview{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+}
+
+.drawCanvas{
+  touch-action:none;
+}
+
+#preview{
+  pointer-events:none;
+}
+
+/* ================= BARRA DE FERRAMENTAS ================= */
+
+.tools{
+  height:65px;
+  min-height:65px;
+  display:flex;
+  gap:6px;
+  padding:7px;
+  background:#25262c;
+  border-top:1px solid #41424a;
+  overflow-x:auto;
+}
+
+.tool{
+  min-width:54px;
+  height:51px;
+  font-size:20px;
+}
+
+.tool small{
+  display:block;
+  font-size:8px;
+}
+
+.tool.active{
+  background:#725df5;
+}
+
+/* ================= PAINEL INFERIOR ================= */
+
+.bottom{
+  height:116px;
+  min-height:116px;
+  background:#202126;
+  border-top:1px solid #41424a;
+  padding:7px;
+  overflow:hidden;
+}
+
+.bottomRow{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  overflow-x:auto;
+}
+
+.bottom button{
+  min-width:43px;
+  height:38px;
+}
+
+.color{
+  width:40px;
+  height:38px;
+  padding:0;
+}
+
+#size{
+  width:120px;
+}
+
+.frames{
+  display:flex;
+  gap:6px;
+  margin-top:7px;
+  overflow-x:auto;
+}
+
+.frame{
+  width:52px;
+  height:52px;
+  min-width:52px;
+  background:#33343b;
+  border:2px solid transparent;
+  border-radius:7px;
+}
+
+.frame.active{
+  border-color:#8d7cff;
+}
+
+.frame img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+/* ================= MODAL ================= */
+
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:50;
+  background:#000b;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:15px;
+}
+
+.box{
+  width:min(430px,94vw);
+  max-height:90vh;
+  overflow:auto;
+  background:#282930;
+  border-radius:18px;
+  padding:18px;
+}
+
+.box h2{
+  margin-top:0;
+}
+
+.actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:15px;
+}
+
+.primary{
+  background:#725df5!important;
+}
+
+.option{
+  width:100%;
+  padding:14px;
+  margin:6px 0;
+  text-align:left;
+}
+
+textarea{
+  width:100%;
+  min-height:100px;
+  resize:none;
+  border:0;
+  border-radius:10px;
+  padding:10px;
+  background:#18191d;
+  color:white;
+}
+
+/* ================= CAMADAS ================= */
+
+.layer{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px;
+  background:#34353d;
+  border-radius:8px;
+  margin:5px 0;
+}
+
+.layer.active{
+  outline:2px solid #725df5;
+}
+
+.layer button{
+  background:transparent;
+  padding:5px;
+}
+
+/* ================= DESKTOP SÓ PARA TESTE ================= */
+
+@media(min-width:700px){
+  #home{
+    max-width:500px;
+    margin:auto;
+  }
+
+  #editor{
+    max-width:600px;
+    margin:auto;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= MENU ================= -->
+
+<section id="home">
+
+  <header class="header">
+    <div class="logo">🎨 <span>DrawMotion</span> Studio</div>
+
+    <button onclick="settings()">⚙️</button>
+  </header>
+
+  <div class="home">
+
+    <button class="card" onclick="newProject()">
+      <span class="icon">🎨</span>
+      <b>Novo desenho</b>
+      <small>Começar um desenho</small>
+    </button>
+
+    <button class="card" onclick="newAnimation()">
+      <span class="icon">🎞️</span>
+      <b>Nova animação</b>
+      <small>Desenhar vários quadros</small>
+    </button>
+
+    <button class="card" onclick="importImage()">
+      <span class="icon">🖼️</span>
+      <b>Importar imagem</b>
+      <small>Desenhar por cima de uma imagem</small>
+    </button>
+
+    <button class="card" onclick="openSaved()">
+      <span class="icon">📂</span>
+      <b>Continuar</b>
+      <small>Abrir desenho salvo</small>
+    </button>
+
+    <button class="card" onclick="drawAI()">
+      <span class="icon">🤖</span>
+      <b>Draw AI</b>
+      <small>Pergunte ou peça um desenho</small>
+    </button>
+
+  </div>
+
+</section>
+
+
+<!-- ================= EDITOR ================= -->
+
+<section id="editor" class="hidden">
+
+  <header class="top">
+
+    <button onclick="goHome()">🏠</button>
+
+    <div class="name" id="projectName">
+      Meu desenho
+    </div>
+
+    <button onclick="undo()">↩️</button>
+    <button onclick="redo()">↪️</button>
+    <button onclick="importImage()">🖼️</button>
+    <button onclick="saveMenu()">💾</button>
+
+  </header>
+
+
+  <main class="work">
+
+    <div id="canvasBox">
+
+      <canvas
+        id="canvas0"
+        class="drawCanvas"
+        width="1200"
+        height="800">
+      </canvas>
+
+      <canvas
+        id="preview"
+        width="1200"
+        height="800">
+      </canvas>
+
+    </div>
+
+  </main>
+
+
+  <!-- FERRAMENTAS -->
+
+  <div class="tools">
+
+    <button class="tool active"
+            onclick="tool('pencil',this)">
+      ✏️<small>Lápis</small>
+    </button>
+
+    <button class="tool"
+            onclick="tool('brush',this)">
+      🖌️<small>Pincel</small>
+    </button>
+
+    <button class="tool"
+            onclick="tool('eraser',this)">
+      🧽<small>Borracha</small>
+    </button>
+
+    <button class="tool"
+            onclick="tool('line',this)">
+      📏<small>Linha</small>
+    </button>
+
+    <button class="tool"
+            onclick="tool('rect',this)">
+      ⬜<small>Quadro</small>
+    </button>
+
+    <button class="tool"
+            onclick="tool('circle',this)">
+      ⭕<small>Círculo</small>
+    </button>
+
+    <button class="tool"
+            onclick="tool('fill',this)">
+      🪣<small>Balde</small>
+    </button>
+
+    <button class="tool"
+            onclick="clearCanvas()">
+      🗑️<small>Limpar</small>
+    </button>
+
+    <button class="tool"
+            onclick="layersMenu()">
+      🗂️<small>Camadas</small>
+    </button>
+
+  </div>
+
+
+  <!-- CONTROLES -->
+
+  <div class="bottom">
+
+    <div class="bottomRow">
+
+      <input
+        id="color"
+        class="color"
+        type="color"
+        value="#111111"
+        onchange="setColor(this.value)">
+
+      <span>📏</span>
+
+      <input
+        id="size"
+        type="range"
+        min="1"
+        max="80"
+        value="8">
+
+      <span id="sizeText">8px</span>
+
+      <button onclick="addLayer()">＋</button>
+
+      <button onclick="transparent()">♢</button>
+
+      <button onclick="rotate()">🔄</button>
+
+      <button onclick="zoomIn()">＋🔍</button>
+
+      <button onclick="zoomOut()">−🔍</button>
+
+      <button onclick="addFrame()">＋🎞️</button>
+
+      <button onclick="play()">▶️</button>
+
+    </div>
+
+    <div class="frames" id="frames"></div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= MODAL ================= -->
+
+<div id="modal" class="modal hidden">
+
+  <div class="box">
+
+    <h2 id="modalTitle">DrawMotion</h2>
+
+    <div id="modalContent"></div>
+
+    <div class="actions">
+
+      <button onclick="closeModal()">Fechar</button>
+
+      <button class="primary"
+              id="modalOK">
+        OK
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<input
+  id="file"
+  type="file"
+  accept="image/*"
+  hidden>
+
+
+<script>
+
+/* =====================================================
+   CONFIGURAÇÃO
+===================================================== */
+
+const W=1200;
+const H=800;
+
+let canvas=document.getElementById("canvas0");
+let ctx=canvas.getContext("2d");
+
+let preview=document.getElementById("preview");
+let pctx=preview.getContext("2d");
+
+let toolName="pencil";
+let color="#111111";
+let size=8;
+
+let drawing=false;
+let sx=0;
+let sy=0;
+
+let undoList=[];
+let redoList=[];
+
+let zoom=1;
+let angle=0;
+
+let transparentBackground=false;
+
+let layers=[
+  {
+    name:"Camada 1",
+    canvas:canvas,
+    ctx:ctx,
+    visible:true
+  }
+];
+
+let activeLayer=0;
+
+let frames=[];
+let activeFrame=0;
+
+let projectName="Meu desenho";
+
+
+/* =====================================================
+   INÍCIO
+===================================================== */
+
+function newProject(){
+
+  projectName="Meu desenho";
+
+  document.getElementById("projectName")
+    .textContent=projectName;
+
+  openEditor();
+
+}
+
+
+function newAnimation(){
+
+  projectName="Minha animação";
+
+  document.getElementById("projectName")
+    .textContent=projectName;
+
+  openEditor();
+
+}
+
+
+function openEditor(){
+
+  document.getElementById("home")
+    .classList.add("hidden");
+
+  document.getElementById("editor")
+    .classList.remove("hidden");
+
+  resetProject();
+
+}
+
+
+function resetProject(){
+
+  undoList=[];
+  redoList=[];
+
+  ctx.clearRect(0,0,W,H);
+
+  if(!transparentBackground){
+
+    ctx.fillStyle="#fff";
+    ctx.fillRect(0,0,W,H);
+
+  }
+
+  frames=[];
+  activeFrame=0;
+
+  frames.push(canvas.toDataURL("image/png"));
+
+  renderFrames();
+
+}
+
+
+function goHome(){
+
+  document.getElementById("editor")
+    .classList.add("hidden");
+
+  document.getElementById("home")
+    .classList.remove("hidden");
+
+}
+
+
+/* =====================================================
+   FERRAMENTAS
+===================================================== */
+
+function tool(t,button){
+
+  toolName=t;
+
+  document
+    .querySelectorAll(".tool")
+    .forEach(x=>x.classList.remove("active"));
+
+  if(button)button.classList.add("active");
+
+}
+
+
+document.getElementById("size")
+.addEventListener("input",function(){
+
+  size=Number(this.value);
+
+  document.getElementById("sizeText")
+    .textContent=size+"px";
+
+});
+
+
+function setColor(c){
+
+  color=c;
+
+}
+
+
+/* =====================================================
+   POSIÇÃO DO TOQUE
+===================================================== */
+
+function position(e){
+
+  const r=canvas.getBoundingClientRect();
+
+  let x;
+  let y;
+
+  if(e.clientX!==undefined){
+
+    x=e.clientX;
+    y=e.clientY;
+
+  }else{
+
+    x=e.touches[0].clientX;
+    y=e.touches[0].clientY;
+
+  }
+
+  return {
+
+    x:(x-r.left)*W/r.width,
+    y:(y-r.top)*H/r.height
+
+  };
+
+}
+
+
+/* =====================================================
+   DESENHO POR TOUCH
+===================================================== */
+
+canvas.addEventListener("pointerdown",start);
+canvas.addEventListener("pointermove",move);
+canvas.addEventListener("pointerup",end);
+canvas.addEventListener("pointercancel",end);
+
+function start(e){
+
+  e.preventDefault();
+
+  canvas.setPointerCapture?.(e.pointerId);
+
+  const p=position(e);
+
+  sx=p.x;
+  sy=p.y;
+
+  drawing=true;
+
+  saveUndo();
+
+  if(toolName==="fill"){
+
+    floodFill(
+      Math.floor(sx),
+      Math.floor(sy)
+    );
+
+    drawing=false;
+
+    return;
+
+  }
+
+  if(
+    toolName==="pencil" ||
+    toolName==="brush" ||
+    toolName==="eraser"
+  ){
+
+    ctx.beginPath();
+    ctx.moveTo(sx,sy);
+
+  }
+
+}
+
+
+function move(e){
+
+  if(!drawing)return;
+
+  e.preventDefault();
+
+  const p=position(e);
+
+  const x=p.x;
+  const y=p.y;
+
+
+  if(
+    toolName==="pencil" ||
+    toolName==="brush" ||
+    toolName==="eraser"
+  ){
+
+    ctx.lineCap="round";
+    ctx.lineJoin="round";
+
+    ctx.lineWidth=
+      toolName==="pencil"
+      ? size
+      : size*2;
+
+
+    if(toolName==="eraser"){
+
+      ctx.globalCompositeOperation=
+        "destination-out";
+
+    }else{
+
+      ctx.globalCompositeOperation=
+        "source-over";
+
+      ctx.strokeStyle=color;
+
+    }
+
+    ctx.lineTo(x,y);
+    ctx.stroke();
+
+    return;
+
+  }
+
+
+  pctx.clearRect(0,0,W,H);
+
+  pctx.strokeStyle=color;
+  pctx.lineWidth=size;
+  pctx.lineCap="round";
+
+
+  if(toolName==="line"){
+
+    pctx.beginPath();
+
+    pctx.moveTo(sx,sy);
+    pctx.lineTo(x,y);
+
+    pctx.stroke();
+
+  }
+
+
+  if(toolName==="rect"){
+
+    pctx.strokeRect(
+      sx,
+      sy,
+      x-sx,
+      y-sy
+    );
+
+  }
+
+
+  if(toolName==="circle"){
+
+    const dx=x-sx;
+    const dy=y-sy;
+
+    const r=Math.sqrt(
+      dx*dx+dy*dy
+    );
+
+    pctx.beginPath();
+
+    pctx.arc(
+      sx,
+      sy,
+      r,
+      0,
+      Math.PI*2
+    );
+
+    pctx.stroke();
+
+  }
+
+}
+
+
+function end(e){
+
+  if(!drawing)return;
+
+  drawing=false;
+
+  if(
+    toolName==="line" ||
+    toolName==="rect" ||
+    toolName==="circle"
+  ){
+
+    ctx.drawImage(
+      preview,
+      0,
+      0
+    );
+
+    pctx.clearRect(0,0,W,H);
+
+  }
+
+  ctx.globalCompositeOperation=
+    "source-over";
+
+}
+
+
+/* =====================================================
+   UNDO
+===================================================== */
+
+function saveUndo(){
+
+  undoList.push(
+    ctx.getImageData(0,0,W,H)
+  );
+
+  if(undoList.length>25)
+    undoList.shift();
+
+  redoList=[];
+
+}
+
+
+function undo(){
+
+  if(!undoList.length)return;
+
+  redoList.push(
+    ctx.getImageData(0,0,W,H)
+  );
+
+  ctx.putImageData(
+    undoList.pop(),
+    0,0
+  );
+
+}
+
+
+function redo(){
+
+  if(!redoList.length)return;
+
+  undoList.push(
+    ctx.getImageData(0,0,W,H)
+  );
+
+  ctx.putImageData(
+    redoList.pop(),
+    0,0
+  );
+
+}
+
+
+/* =====================================================
+   BALDE
+===================================================== */
+
+function floodFill(x,y){
+
+  const image=ctx.getImageData(
+    0,0,W,H
+  );
+
+  const data=image.data;
+
+  const start=(y*W+x)*4;
+
+  const target=[
+    data[start],
+    data[start+1],
+    data[start+2],
+    data[start+3]
+  ];
+
+  const fill=hexRGBA(color);
+
+  if(
+    target[0]===fill[0] &&
+    target[1]===fill[1] &&
+    target[2]===fill[2] &&
+    target[3]===fill[3]
+  )return;
+
+
+  const stack=[[x,y]];
+  const visited=new Uint8Array(W*H);
+
+
+  while(stack.length){
+
+    const point=stack.pop();
+
+    const px=point[0];
+    const py=point[1];
+
+    if(
+      px<0 ||
+      py<0 ||
+      px>=W ||
+      py>=H
+    )continue;
+
+    const p=py*W+px;
+
+    if(visited[p])continue;
+
+    const i=p*4;
+
+    if(
+      data[i]!==target[0] ||
+      data[i+1]!==target[1] ||
+      data[i+2]!==target[2] ||
+      data[i+3]!==target[3]
+    )continue;
+
+    visited[p]=1;
+
+    data[i]=fill[0];
+    data[i+1]=fill[1];
+    data[i+2]=fill[2];
+    data[i+3]=255;
+
+    stack.push(
+      [px+1,py],
+      [px-1,py],
+      [px,py+1],
+      [px,py-1]
+    );
+
+  }
+
+  ctx.putImageData(image,0,0);
+
+}
+
+
+function hexRGBA(hex){
+
+  hex=hex.replace("#","");
+
+  if(hex.length===3)
+    hex=hex.split("")
+      .map(x=>x+x)
+      .join("");
+
+  return[
+    parseInt(hex.slice(0,2),16),
+    parseInt(hex.slice(2,4),16),
+    parseInt(hex.slice(4,6),16),
+    255
+  ];
+
+}
+
+
+/* =====================================================
+   CAMADAS
+===================================================== */
+
+function addLayer(){
+
+  const c=document.createElement("canvas");
+
+  c.width=W;
+  c.height=H;
+
+  c.style.position="absolute";
+  c.style.inset="0";
+  c.style.width="100%";
+  c.style.height="100%";
+  c.style.touchAction="none";
+
+  document.getElementById("canvasBox")
+    .insertBefore(c,preview);
+
+  const newLayer={
+    name:"Camada "+(layers.length+1),
+    canvas:c,
+    ctx:c.getContext("2d"),
+    visible:true
+  };
+
+  layers.push(newLayer);
+
+  activeLayer=layers.length-1;
+
+  /* A ferramenta de desenho passa a usar a camada ativa */
+  canvas=newLayer.canvas;
+  ctx=newLayer.ctx;
+
+  canvas.addEventListener("pointerdown",start);
+  canvas.addEventListener("pointermove",move);
+  canvas.addEventListener("pointerup",end);
+  canvas.addEventListener("pointercancel",end);
+
+}
+
+
+function layersMenu(){
+
+  let html="<h3>🗂️ Camadas</h3>";
+
+  layers.forEach((l,i)=>{
+
+    html+=`
+      <div class="layer ${i===activeLayer?"active":""}">
+        <span>${l.name}</span>
+        <button onclick="selectLayer(${i})">
+          ${i===activeLayer?"●":"○"}
+        </button>
+      </div>
+    `;
+
+  });
+
+  html+=`
+    <button class="option primary"
+            onclick="addLayer();closeModal()">
+      ＋ Nova camada
+    </button>
+  `;
+
+  openModal(
+    "Camadas",
+    html,
+    closeModal
+  );
+
+}
+
+
+function selectLayer(i){
+
+  activeLayer=i;
+
+  canvas=layers[i].canvas;
+  ctx=layers[i].ctx;
+
+  closeModal();
+
+}
+
+
+/* =====================================================
+   LIMPAR
+===================================================== */
+
+function clearCanvas(){
+
+  saveUndo();
+
+  ctx.clearRect(
+    0,0,W,H
+  );
+
+}
+
+
+/* =====================================================
+   FUNDO TRANSPARENTE
+===================================================== */
+
+function transparent(){
+
+  transparentBackground=
+    !transparentBackground;
+
+  if(!transparentBackground){
+
+    ctx.globalCompositeOperation=
+      "destination-over";
+
+    ctx.fillStyle="#fff";
+
+    ctx.fillRect(0,0,W,H);
+
+    ctx.globalCompositeOperation=
+      "source-over";
+
+  }
+
+}
+
+
+/* =====================================================
+   ZOOM / ROTAÇÃO
+===================================================== */
+
+function updateTransform(){
+
+  document.getElementById("canvasBox")
+    .style.transform=
+      `scale(${zoom}) rotate(${angle}deg)`;
+
+}
+
+
+function zoomIn(){
+
+  zoom=Math.min(2,zoom+.1);
+  updateTransform();
+
+}
+
+
+function zoomOut(){
+
+  zoom=Math.max(.5,zoom-.1);
+  updateTransform();
+
+}
+
+
+function rotate(){
+
+  angle+=90;
+
+  if(angle>=360)
+    angle=0;
+
+  updateTransform();
+
+}
+
+
+/* =====================================================
+   SALVAR
+===================================================== */
+
+function merge(){
+
+  const out=document.createElement("canvas");
+
+  out.width=W;
+  out.height=H;
+
+  const o=out.getContext("2d");
+
+  layers.forEach(l=>{
+
+    if(l.visible)
+      o.drawImage(l.canvas,0,0);
+
+  });
+
+  return out;
+
+}
+
+
+function saveMenu(){
+
+  openModal(
+    "💾 Salvar desenho",
+
+    `
+      <button class="option"
+              onclick="saveTransparentPNG()">
+        🟣 Salvar como PNG sem fundo
+        <br>
+        <small>Imagem transparente</small>
+      </button>
+
+      <button class="option"
+              onclick="saveImage()">
+        🖼️ Salvar como imagem
+        <br>
+        <small>Imagem normal</small>
+      </button>
+
+      <button class="option"
+              onclick="saveFrame()">
+        🎞️ Guardar como quadro
+        <br>
+        <small>O desenho aparecerá nos frames</small>
+      </button>
+    `,
+
+    closeModal
+  );
+
+}
+
+
+function downloadCanvas(c,name){
+
+  const a=document.createElement("a");
+
+  a.download=name;
+
+  a.href=c.toDataURL("image/png");
+
+  a.click();
+
+}
+
+
+function saveTransparentPNG(){
+
+  const out=merge();
+
+  downloadCanvas(
+    out,
+    "DrawMotion-sem-fundo.png"
+  );
+
+  saveProject();
+
+  closeModal();
+
+}
+
+
+function saveImage(){
+
+  const out=merge();
+
+  const final=document.createElement("canvas");
+
+  final.width=W;
+  final.height=H;
+
+  const f=final.getContext("2d");
+
+  f.fillStyle="#fff";
+  f.fillRect(0,0,W,H);
+
+  f.drawImage(out,0,0);
+
+  downloadCanvas(
+    final,
+    "DrawMotion.png"
+  );
+
+  saveProject();
+
+  closeModal();
+
+}
+
+
+function saveFrame(){
+
+  frames.push(
+    merge().toDataURL("image/png")
+  );
+
+  activeFrame=frames.length-1;
+
+  renderFrames();
+
+  saveProject();
+
+  closeModal();
+
+}
+
+
+/* =====================================================
+   FRAMES
+===================================================== */
+
+function addFrame(){
+
+  frames.push(
+    merge().toDataURL("image/png")
+  );
+
+  activeFrame=frames.length-1;
+
+  renderFrames();
+
+}
+
+
+function renderFrames(){
+
+  const area=
+    document.getElementById("frames");
+
+  area.innerHTML="";
+
+  frames.forEach((src,i)=>{
+
+    const d=document.createElement("div");
+
+    d.className=
+      "frame "+(i===activeFrame?"active":"");
+
+    const img=document.createElement("img");
+
+    img.src=src;
+
+    d.appendChild(img);
+
+    d.onclick=()=>{
+      loadFrame(i);
+    };
+
+    area.appendChild(d);
+
+  });
+
+}
+
+
+function loadFrame(i){
+
+  activeFrame=i;
+
+  const img=new Image();
+
+  img.onload=()=>{
+
+    ctx.clearRect(0,0,W,H);
+
+    ctx.drawImage(img,0,0);
+
+  };
+
+  img.src=frames[i];
+
+  renderFrames();
+
+}
+
+
+function play(){
+
+  if(frames.length<2){
+
+    alert("Crie pelo menos 2 quadros.");
+
+    return;
+
+  }
+
+  let i=0;
+
+  setInterval(()=>{
+
+    loadFrame(i);
+
+    i++;
+
+    if(i>=frames.length)
+      i=0;
+
+  },1000/12);
+
+}
+
+
+/* =====================================================
+   IMPORTAR IMAGEM
+===================================================== */
+
+function importImage(){
+
+  document.getElementById("file").click();
+
+}
+
+
+document.getElementById("file")
+.addEventListener("change",function(){
+
+  const file=this.files[0];
+
+  if(!file)return;
+
+  const img=new Image();
+
+  img.onload=()=>{
+
+    saveUndo();
+
+    ctx.clearRect(0,0,W,H);
+
+    const scale=Math.min(
+      W/img.width,
+      H/img.height
+    );
+
+    const w=img.width*scale;
+    const h=img.height*scale;
+
+    ctx.drawImage(
+      img,
+      (W-w)/2,
+      (H-h)/2,
+      w,
+      h
+    );
+
+    URL.revokeObjectURL(img.src);
+
+  };
+
+  img.src=URL.createObjectURL(file);
+
+});
+
+
+/* =====================================================
+   PROJETO LOCAL
+===================================================== */
+
+function saveProject(){
+
+  try{
+
+    localStorage.setItem(
+      "drawmotion-project",
+      JSON.stringify({
+        image:merge().toDataURL("image/png"),
+        name:projectName,
+        frames:frames
+      })
+    );
+
+  }catch(e){
+
+    console.log("Não foi possível salvar:",e);
+
+  }
+
+}
+
+
+function openSaved(){
+
+  const saved=
+    localStorage.getItem(
+      "drawmotion-project"
+    );
+
+  if(!saved){
+
+    alert("Nenhum desenho salvo.");
+
+    return;
+
+  }
+
+  const data=JSON.parse(saved);
+
+  projectName=
+    data.name||"Meu desenho";
+
+  openEditor();
+
+  const img=new Image();
+
+  img.onload=()=>{
+
+    ctx.clearRect(0,0,W,H);
+
+    ctx.drawImage(img,0,0);
+
+  };
+
+  img.src=data.image;
+
+  if(data.frames){
+
+    frames=data.frames;
+
+    renderFrames();
+
+  }
+
+}
+
+
+/* =====================================================
+   DRAW AI
+===================================================== */
+
+function drawAI(){
+
+  openModal(
+    "🤖 Draw AI",
+
+    `
+      <p>
+        Pergunte alguma coisa ou peça uma ideia de desenho.
+      </p>
+
+      <textarea id="aiText"
+        placeholder="Exemplo: desenhe uma casa simples"></textarea>
+
+      <div id="aiAnswer"
+           style="margin-top:10px;color:#bbb">
+      </div>
+    `,
+
+    answerAI
+  );
+
+}
+
+
+function answerAI(){
+
+  const text=
+    document.getElementById("aiText")
+      .value
+      .toLowerCase();
+
+  const answer=
+    document.getElementById("aiAnswer");
+
+  if(!text){
+
+    answer.textContent=
+      "Digite uma pergunta ou pedido.";
+
+    return;
+
+  }
+
+
+  if(
+    text.includes("círculo") ||
+    text.includes("circulo")
+  ){
+
+    answer.textContent=
+      "Vou colocar um círculo no quadro.";
+
+    closeModal();
+
+    toolName="circle";
+
+    return;
+
+  }
+
+
+  if(text.includes("quadrado")){
+
+    answer.textContent=
+      "Use a ferramenta ⬜ Quadro para desenhar um quadrado.";
+
+    return;
+
+  }
+
+
+  if(
+    text.includes("casa") ||
+    text.includes("desenho")
+  ){
+
+    answer.textContent=
+      "Você pode usar Linha, Quadro e Círculo para montar o desenho.";
+
+    return;
+
+  }
+
+
+  answer.textContent=
+    "Posso responder perguntas simples e ajudar você a escolher as ferramentas do DrawMotion.";
+
+}
+
+
+/* =====================================================
+   CONFIGURAÇÕES
+===================================================== */
+
+function settings(){
+
+  openModal(
+    "⚙️ Configurações",
+
+    `
+      <p><b>DrawMotion Studio Mobile</b></p>
+
+      <button class="option"
+              onclick="toggleFullscreen()">
+        ⛶ Tela cheia
+      </button>
+
+      <button class="option"
+              onclick="transparent();closeModal()">
+        ♢ Fundo transparente
+      </button>
+
+      <p style="color:#aaa">
+        Esta versão foi feita para celular.
+        O desenho funciona com toque.
+      </p>
+    `,
+
+    closeModal
+  );
+
+}
+
+
+function toggleFullscreen(){
+
+  if(!document.fullscreenElement){
+
+    document.documentElement
+      .requestFullscreen?.();
+
+  }else{
+
+    document.exitFullscreen?.();
+
+  }
+
+}
+
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+function openModal(title,content,ok){
+
+  document.getElementById("modalTitle")
+    .textContent=title;
+
+  document.getElementById("modalContent")
+    .innerHTML=content;
+
+  document.getElementById("modal")
+    .classList.remove("hidden");
+
+  document.getElementById("modalOK")
+    .onclick=ok;
+
+}
+
+
+function closeModal(){
+
+  document.getElementById("modal")
+    .classList.add("hidden");
+
+}
+
+</script>
+
+</body>
+</html>
