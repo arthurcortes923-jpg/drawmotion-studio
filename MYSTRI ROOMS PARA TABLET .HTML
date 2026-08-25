@@ -1,0 +1,2374 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1.0,user-scalable=no">
+<title>Mystery Rooms - Tablet</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#000;
+    color:#fff;
+    font-family:Arial,sans-serif;
+    touch-action:none;
+}
+
+button{
+    border:1px solid #555;
+    background:#151515;
+    color:#fff;
+    border-radius:8px;
+    padding:12px 18px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+button:active{
+    background:#333;
+    transform:scale(.97);
+}
+
+/* ================= MENU ================= */
+
+#menu{
+    position:fixed;
+    inset:0;
+    z-index:1000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+        radial-gradient(circle at center,#303030 0%,#111 50%,#000 100%);
+}
+
+.menuBox{
+    width:min(520px,90vw);
+    text-align:center;
+}
+
+.logo{
+    font-size:clamp(36px,7vw,60px);
+    font-weight:bold;
+    letter-spacing:5px;
+    text-shadow:0 0 20px #fff;
+}
+
+.sub{
+    color:#aaa;
+    margin:12px 0 28px;
+}
+
+.menuBtn{
+    width:100%;
+    height:60px;
+    margin:6px 0;
+    font-size:19px;
+}
+
+.stars{
+    margin:15px;
+    font-size:22px;
+}
+
+/* ================= PAINÉIS ================= */
+
+.panel,
+#puzzleOverlay,
+#message,
+#gameOver{
+    position:fixed;
+    inset:0;
+    z-index:2000;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.94);
+}
+
+.panelBox,
+.puzzleBox,
+.messageBox{
+    width:min(700px,92vw);
+    max-height:90vh;
+    overflow:auto;
+    background:#111;
+    border:1px solid #666;
+    border-radius:12px;
+    padding:25px;
+    text-align:center;
+}
+
+.panelBox h2,
+.puzzleBox h2{
+    margin-bottom:15px;
+}
+
+.panelBox p{
+    color:#bbb;
+    line-height:1.5;
+    margin:8px 0;
+}
+
+.close{
+    margin-top:20px;
+    width:180px;
+}
+
+/* ================= JOGO ================= */
+
+#game{
+    position:fixed;
+    inset:0;
+    display:none;
+    overflow:hidden;
+    background:#080808;
+}
+
+#world{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+}
+
+/* ================= HUD ================= */
+
+#hud{
+    position:fixed;
+    left:12px;
+    top:12px;
+    z-index:100;
+    min-width:190px;
+    padding:12px;
+    background:rgba(0,0,0,.78);
+    border:1px solid #555;
+    border-radius:10px;
+}
+
+#timeBar{
+    width:100%;
+    height:7px;
+    background:#fff;
+    margin:6px 0;
+}
+
+#timerText{
+    font-size:23px;
+    font-weight:bold;
+}
+
+#inventory{
+    margin-top:8px;
+    color:#bbb;
+    font-size:13px;
+}
+
+/* ================= MINIMAPA ================= */
+
+#miniMap{
+    position:fixed;
+    right:12px;
+    top:12px;
+    width:210px;
+    height:145px;
+    z-index:100;
+    background:rgba(0,0,0,.88);
+    border:2px solid #555;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+#miniCanvas{
+    width:100%;
+    height:100%;
+}
+
+#mapLegend{
+    position:absolute;
+    bottom:4px;
+    left:6px;
+    font-size:10px;
+    color:#aaa;
+}
+
+/* ================= CONTROLES ================= */
+
+#touchInfo{
+    position:fixed;
+    left:50%;
+    bottom:10px;
+    transform:translateX(-50%);
+    z-index:90;
+    color:#888;
+    font-size:12px;
+    pointer-events:none;
+}
+
+#joystick{
+    position:fixed;
+    width:125px;
+    height:125px;
+    z-index:500;
+    display:none;
+    pointer-events:none;
+}
+
+#joystickBase{
+    position:absolute;
+    inset:0;
+    border-radius:50%;
+    background:rgba(255,255,255,.12);
+    border:2px solid rgba(255,255,255,.35);
+}
+
+#joystickBall{
+    position:absolute;
+    width:52px;
+    height:52px;
+    left:36px;
+    top:36px;
+    border-radius:50%;
+    background:rgba(255,255,255,.75);
+    border:2px solid #fff;
+    box-shadow:0 0 18px rgba(255,255,255,.35);
+}
+
+#interact{
+    position:fixed;
+    right:18px;
+    bottom:25px;
+    z-index:500;
+    display:none;
+    min-width:190px;
+    min-height:55px;
+}
+
+/* ================= HINT ================= */
+
+#hint{
+    position:fixed;
+    left:50%;
+    bottom:95px;
+    transform:translateX(-50%);
+    z-index:600;
+    display:none;
+    padding:13px 20px;
+    background:rgba(0,0,0,.92);
+    border:1px solid #777;
+    border-radius:8px;
+}
+
+/* ================= PUZZLES ================= */
+
+#puzzleDescription{
+    color:#aaa;
+    line-height:1.5;
+    margin-bottom:18px;
+}
+
+#puzzleArea{
+    min-height:230px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:15px;
+}
+
+.input{
+    width:220px;
+    padding:13px;
+    background:#050505;
+    border:1px solid #777;
+    border-radius:7px;
+    color:#fff;
+    text-align:center;
+    font-size:21px;
+}
+
+.sequence{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:10px;
+}
+
+.sequence button{
+    width:62px;
+    height:62px;
+    font-size:22px;
+}
+
+/* ================= QUEBRA CABEÇA ================= */
+
+.jigsawHelp{
+    margin-bottom:12px;
+    padding:10px;
+    background:#181818;
+    border:1px solid #555;
+    border-radius:8px;
+    color:#ccc;
+}
+
+.jigsaw{
+    width:min(360px,80vw);
+    aspect-ratio:1;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:3px;
+    padding:3px;
+    background:#444;
+}
+
+.jigsaw button{
+    padding:0;
+    font-size:32px;
+    border-radius:0;
+    min-width:0;
+    min-height:0;
+}
+
+.jigsaw button.selected{
+    outline:4px solid #fff;
+    z-index:2;
+}
+
+/* ================= GAME OVER ================= */
+
+#gameOver{
+    flex-direction:column;
+    text-align:center;
+}
+
+#gameOver h1{
+    font-size:clamp(35px,8vw,60px);
+    margin-bottom:12px;
+}
+
+#gameOver button{
+    margin-top:12px;
+    min-width:220px;
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:700px){
+
+    #miniMap{
+        width:155px;
+        height:110px;
+    }
+
+    #hud{
+        min-width:150px;
+    }
+
+    #helpText{
+        display:none;
+    }
+
+    #interact{
+        right:10px;
+        bottom:20px;
+    }
+
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= MENU ================= -->
+
+<div id="menu">
+
+    <div class="menuBox">
+
+        <div class="logo">
+            MYSTERY<br>ROOMS
+        </div>
+
+        <div class="sub">
+            20 puzzles. 21 minutos. Uma saída.
+        </div>
+
+        <div class="stars" id="menuStars">
+            ⭐ 0 &nbsp; 🔵 0
+        </div>
+
+        <button class="menuBtn" onclick="startGame()">
+            ▶ JOGAR
+        </button>
+
+        <button class="menuBtn" onclick="openPanel('how')">
+            💡 COMO JOGAR
+        </button>
+
+        <button class="menuBtn" onclick="openPanel('puzzles')">
+            🧩 PUZZLES
+        </button>
+
+        <button class="menuBtn" onclick="openPanel('achievements')">
+            🏆 CONQUISTAS
+        </button>
+
+    </div>
+</div>
+
+<!-- ================= COMO JOGAR ================= -->
+
+<div id="how" class="panel">
+
+    <div class="panelBox">
+
+        <h2>COMO JOGAR</h2>
+
+        <p>📱 <b>Tablet:</b> toque na tela e arraste para criar a bola de movimento.</p>
+
+        <p>⚪ A bola funciona como um joystick.</p>
+
+        <p>Arraste para cima → personagem anda para cima.</p>
+        <p>Arraste para baixo → personagem anda para baixo.</p>
+        <p>Arraste para esquerda/direita → personagem anda.</p>
+
+        <p>🧩 Encontre e resolva os puzzles.</p>
+
+        <p>🟠 Os puzzles laranja são os principais.</p>
+
+        <p>🔵 Os puzzles azuis são secundários.</p>
+
+        <p>🔴 A porta vermelha é a saída.</p>
+
+        <p>
+            Para escapar, todos os puzzles necessários
+            precisam ser concluídos.
+        </p>
+
+        <button class="close" onclick="closePanel('how')">
+            ❌ FECHAR
+        </button>
+
+    </div>
+
+</div>
+
+<!-- ================= PUZZLES ================= -->
+
+<div id="puzzles" class="panel">
+
+    <div class="panelBox">
+
+        <h2>🧩 PUZZLES</h2>
+
+        <p>🟠 1 — Sequência</p>
+        <p>🔵 2 — Matemática</p>
+        <p>🔵 3 — Cores</p>
+        <p>🔵 4 — Memória</p>
+        <p>🟠 5 — Matemática</p>
+        <p>🔵 6 — Fusíveis</p>
+        <p>🔵 7 — Objeto diferente</p>
+        <p>🔵 8 — Código</p>
+        <p>🔵 9 — Estrelas</p>
+        <p>🔵 10 — Sequência numérica</p>
+        <p>🔵 11 — Relógio</p>
+        <p>🔵 12 — Palavra secreta</p>
+        <p>🟠 13 — Luzes</p>
+        <p>🔵 14 — Chaves</p>
+        <p>🟠 15 — Matemática</p>
+        <p>🔵 16 — Número faltando</p>
+        <p>🔵 17 — Fusíveis</p>
+        <p>🟠 18 — Computador</p>
+        <p>🔵 19 — Cofre</p>
+        <p>🟠 20 — Quebra-cabeça</p>
+
+        <button class="close" onclick="closePanel('puzzles')">
+            ❌ FECHAR
+        </button>
+
+    </div>
+
+</div>
+
+<!-- ================= CONQUISTAS ================= -->
+
+<div id="achievements" class="panel">
+
+    <div class="panelBox">
+
+        <h2>🏆 CONQUISTAS</h2>
+
+        <p id="achievementText">
+            Nenhuma conquista ainda.
+        </p>
+
+        <button class="close"
+                onclick="closePanel('achievements')">
+            ❌ FECHAR
+        </button>
+
+    </div>
+
+</div>
+
+<!-- ================= GAME ================= -->
+
+<div id="game">
+
+    <canvas id="world"></canvas>
+
+    <div id="hud">
+
+        <b>MYSTERY ROOMS</b>
+
+        <div style="margin-top:6px">
+            TEMPO
+        </div>
+
+        <div id="timeBar"></div>
+
+        <div id="timerText">
+            21:00
+        </div>
+
+        <div id="inventory">
+            Inventário:<br>
+            — vazio
+        </div>
+
+    </div>
+
+    <div id="miniMap">
+
+        <canvas id="miniCanvas"></canvas>
+
+        <div id="mapLegend">
+            🟠 principal 🔵 secundário 🔴 saída
+        </div>
+
+    </div>
+
+    <div id="touchInfo">
+        Toque e arraste para andar
+    </div>
+
+    <div id="joystick">
+
+        <div id="joystickBase"></div>
+
+        <div id="joystickBall"></div>
+
+    </div>
+
+    <button id="interact"
+            onclick="interact()">
+        INTERAGIR
+    </button>
+
+    <div id="hint"></div>
+
+</div>
+
+<!-- ================= PUZZLE OVERLAY ================= -->
+
+<div id="puzzleOverlay">
+
+    <div class="puzzleBox">
+
+        <h2 id="puzzleTitle">
+            PUZZLE
+        </h2>
+
+        <div id="puzzleDescription"></div>
+
+        <div id="puzzleArea"></div>
+
+        <button class="close"
+                onclick="closePuzzle()">
+            ❌ FECHAR PUZZLE
+        </button>
+
+    </div>
+
+</div>
+
+<!-- ================= MESSAGE ================= -->
+
+<div id="message">
+
+    <div class="messageBox">
+
+        <div id="messageText"></div>
+
+        <button class="close"
+                onclick="closeMessage()">
+            OK
+        </button>
+
+    </div>
+
+</div>
+
+<!-- ================= GAME OVER ================= -->
+
+<div id="gameOver">
+
+    <h1 id="gameOverTitle"></h1>
+
+    <p id="gameOverText"></p>
+
+    <button onclick="restartGame()">
+        JOGAR NOVAMENTE
+    </button>
+
+    <button onclick="backMenu()">
+        MENU
+    </button>
+
+</div>
+
+<script>
+
+/* =====================================================
+   CONFIGURAÇÃO
+===================================================== */
+
+const GAME_TIME=1260; // 21 minutos
+
+const WORLD_W=15000;
+const WORLD_H=10000;
+
+const MAIN_PUZZLES=[
+    1,5,13,15,18,20
+];
+
+/*
+   Os principais dão as ferramentas.
+*/
+
+const TOOL_REWARDS={
+    1:"Chave de fenda",
+    5:"Lanterna",
+    13:"Chave",
+    15:"Cartão",
+    18:"Código",
+    20:"Ferramenta final"
+};
+
+/* =====================================================
+   CANVAS
+===================================================== */
+
+const canvas=document.getElementById("world");
+const ctx=canvas.getContext("2d");
+
+const miniCanvas=document.getElementById("miniCanvas");
+const miniCtx=miniCanvas.getContext("2d");
+
+function resize(){
+
+    canvas.width=innerWidth;
+    canvas.height=innerHeight;
+
+    miniCanvas.width=210;
+    miniCanvas.height=145;
+
+}
+
+addEventListener("resize",resize);
+resize();
+
+/* =====================================================
+   JOGADOR
+===================================================== */
+
+let player={
+    x:800,
+    y:900,
+    speed:5
+};
+
+let camera={
+    x:0,
+    y:0
+};
+
+/* =====================================================
+   ESTADO
+===================================================== */
+
+let gameStarted=false;
+let gameTime=0;
+let currentPuzzle=null;
+
+let inventory=[];
+let stars=0;
+let blueStars=0;
+
+let joystickActive=false;
+let joystickPointer=null;
+
+let joystickX=0;
+let joystickY=0;
+
+/* =====================================================
+   SALAS
+===================================================== */
+
+const rooms=[
+
+ {name:"HALL",x:500,y:600,w:1200,h:700},
+ {name:"SALA",x:1900,y:600,w:1300,h:700},
+ {name:"COZINHA",x:3500,y:600,w:1100,h:900},
+ {name:"QUARTO",x:500,y:1800,w:1200,h:900},
+ {name:"BIBLIOTECA",x:1900,y:1800,w:1300,h:1000},
+ {name:"OFICINA",x:3500,y:1900,w:1200,h:1000},
+ {name:"SUBSOLO",x:5000,y:700,w:1600,h:2300},
+ {name:"CORREDOR NORTE",x:6000,y:700,w:5000,h:600},
+ {name:"LABORATÓRIO",x:7000,y:1800,w:1500,h:1200},
+ {name:"ARQUIVO",x:9000,y:1800,w:1500,h:1200},
+ {name:"SALA FINAL",x:11000,y:1800,w:1800,h:1500}
+
+];
+
+/* =====================================================
+   PUZZLES
+===================================================== */
+
+let puzzles=[];
+
+const puzzlePositions=[
+
+ [800,1100],
+ [2200,900],
+ [2700,1100],
+ [3900,900],
+ [1100,2200],
+ [2200,2100],
+ [2800,2500],
+ [3900,2400],
+ [5300,1000],
+ [5700,1800],
+ [6200,1000],
+ [6500,1200],
+ [7500,2300],
+ [8200,2600],
+ [9300,2200],
+ [9700,2700],
+ [10300,1000],
+ [11500,2100],
+ [12000,2600],
+ [11200,3000]
+
+];
+
+for(let i=1;i<=20;i++){
+
+    puzzles.push({
+
+        id:i,
+
+        x:puzzlePositions[i-1][0],
+
+        y:puzzlePositions[i-1][1],
+
+        done:false,
+
+        main:MAIN_PUZZLES.includes(i)
+
+    });
+
+}
+
+/* =====================================================
+   DISTÂNCIA
+===================================================== */
+
+function dist(a,b){
+
+    return Math.hypot(
+        a.x-b.x,
+        a.y-b.y
+    );
+
+}
+
+/* =====================================================
+   MENU
+===================================================== */
+
+function openPanel(id){
+
+    document.getElementById(id)
+        .style.display="flex";
+
+}
+
+function closePanel(id){
+
+    document.getElementById(id)
+        .style.display="none";
+
+}
+
+function updateMenuStars(){
+
+    document.getElementById("menuStars")
+        .innerHTML=
+        "⭐ "+stars+
+        " &nbsp; 🔵 "+blueStars;
+
+}
+
+/* =====================================================
+   COMEÇAR
+===================================================== */
+
+function startGame(){
+
+    document.getElementById("menu")
+        .style.display="none";
+
+    document.getElementById("game")
+        .style.display="block";
+
+    document.getElementById("gameOver")
+        .style.display="none";
+
+    gameStarted=true;
+
+    gameTime=0;
+
+    inventory=[];
+
+    player.x=800;
+    player.y=900;
+
+    puzzles.forEach(p=>p.done=false);
+
+    updateInventory();
+
+    showMessage(
+        "🔎 A investigação começou!<br><br>"+
+        "Encontre os 20 puzzles.<br>"+
+        "A saída está marcada em <b>VERMELHO</b> no mapa."
+    );
+
+}
+
+/* =====================================================
+   JOYSTICK
+===================================================== */
+
+const joystick=document.getElementById("joystick");
+const joystickBall=document.getElementById("joystickBall");
+
+function startJoystick(x,y,pointerId){
+
+    joystickActive=true;
+    joystickPointer=pointerId;
+
+    joystick.style.display="block";
+
+    joystick.style.left=
+        (x-62)+"px";
+
+    joystick.style.top=
+        (y-62)+"px";
+
+    joystickX=x;
+    joystickY=y;
+
+    moveJoystick(x,y);
+
+}
+
+function moveJoystick(x,y){
+
+    if(!joystickActive)return;
+
+    const centerX=
+        parseFloat(joystick.style.left)+62;
+
+    const centerY=
+        parseFloat(joystick.style.top)+62;
+
+    let dx=x-centerX;
+    let dy=y-centerY;
+
+    const max=43;
+
+    const length=Math.hypot(dx,dy);
+
+    if(length>max){
+
+        dx=dx/length*max;
+        dy=dy/length*max;
+
+    }
+
+    joystickBall.style.left=
+        (36+dx)+"px";
+
+    joystickBall.style.top=
+        (36+dy)+"px";
+
+    joystickX=dx/max;
+    joystickY=dy/max;
+
+}
+
+function stopJoystick(){
+
+    joystickActive=false;
+    joystickPointer=null;
+
+    joystick.style.display="none";
+
+    joystickBall.style.left="36px";
+    joystickBall.style.top="36px";
+
+    joystickX=0;
+    joystickY=0;
+
+}
+
+document.addEventListener("pointerdown",e=>{
+
+    if(!gameStarted)return;
+
+    if(
+        e.target.closest("button") ||
+        e.target.closest(".panel") ||
+        e.target.closest("#puzzleOverlay") ||
+        e.target.closest("#message")
+    )return;
+
+    startJoystick(
+        e.clientX,
+        e.clientY,
+        e.pointerId
+    );
+
+});
+
+document.addEventListener("pointermove",e=>{
+
+    if(
+        joystickActive &&
+        e.pointerId===joystickPointer
+    ){
+
+        moveJoystick(
+            e.clientX,
+            e.clientY
+        );
+
+    }
+
+});
+
+document.addEventListener("pointerup",e=>{
+
+    if(
+        e.pointerId===joystickPointer
+    ){
+
+        stopJoystick();
+
+    }
+
+});
+
+document.addEventListener("pointercancel",stopJoystick);
+
+/* =====================================================
+   MOVIMENTO
+===================================================== */
+
+function updateMovement(){
+
+    if(!gameStarted)return;
+
+    let dx=joystickX;
+    let dy=joystickY;
+
+    if(Math.abs(dx)>.03 ||
+       Math.abs(dy)>.03){
+
+        player.x+=dx*player.speed;
+        player.y+=dy*player.speed;
+
+    }
+
+    player.x=
+        Math.max(
+            30,
+            Math.min(WORLD_W-30,player.x)
+        );
+
+    player.y=
+        Math.max(
+            30,
+            Math.min(WORLD_H-30,player.y)
+        );
+
+}
+
+/* =====================================================
+   CÂMERA
+===================================================== */
+
+function updateCamera(){
+
+    camera.x=
+        player.x-canvas.width/2;
+
+    camera.y=
+        player.y-canvas.height/2;
+
+    camera.x=
+        Math.max(
+            0,
+            Math.min(
+                WORLD_W-canvas.width,
+                camera.x
+            )
+        );
+
+    camera.y=
+        Math.max(
+            0,
+            Math.min(
+                WORLD_H-canvas.height,
+                camera.y
+            )
+        );
+
+}
+
+/* =====================================================
+   OBJETO PRÓXIMO
+===================================================== */
+
+function getNearby(){
+
+    let best=null;
+    let bestDist=130;
+
+    puzzles.forEach(p=>{
+
+        const d=dist(player,p);
+
+        if(d<bestDist){
+
+            bestDist=d;
+            best=p;
+
+        }
+
+    });
+
+    if(
+        dist(
+            player,
+            {x:11200,y:3000}
+        )<130
+    ){
+
+        best={
+            id:"exit",
+            x:11200,
+            y:3000
+        };
+
+    }
+
+    return best;
+
+}
+
+/* =====================================================
+   INTERAÇÃO
+===================================================== */
+
+function checkNearby(){
+
+    const obj=getNearby();
+
+    const btn=document.getElementById("interact");
+
+    if(!obj){
+
+        btn.style.display="none";
+
+        return;
+
+    }
+
+    btn.style.display="block";
+
+    if(obj.id==="exit"){
+
+        btn.textContent="🔴 PORTA DE SAÍDA";
+
+    }else{
+
+        btn.textContent=
+            "🧩 PUZZLE "+obj.id+
+            (obj.main?" 🟠":" 🔵");
+
+    }
+
+}
+
+function interact(){
+
+    if(!gameStarted)return;
+
+    const obj=getNearby();
+
+    if(!obj){
+
+        showHint("Nada para interagir aqui.");
+
+        return;
+
+    }
+
+    if(obj.id==="exit"){
+
+        tryExit();
+
+        return;
+
+    }
+
+    if(obj.done){
+
+        showHint("Esse puzzle já foi completado.");
+
+        return;
+
+    }
+
+    openPuzzle(obj.id);
+
+}
+
+/* =====================================================
+   ABRIR PUZZLE
+===================================================== */
+
+function openPuzzle(id){
+
+    currentPuzzle=
+        puzzles.find(p=>p.id===id);
+
+    document.getElementById("puzzleOverlay")
+        .style.display="flex";
+
+    document.getElementById("puzzleTitle")
+        .textContent=
+        "PUZZLE "+id+
+        (currentPuzzle.main?" 🟠":" 🔵");
+
+    const desc=
+        document.getElementById("puzzleDescription");
+
+    const area=
+        document.getElementById("puzzleArea");
+
+    area.innerHTML="";
+
+    /* 1 */
+
+    if(id===1){
+
+        desc.textContent=
+            "Clique na sequência correta: ▲ ● ■";
+
+        sequence(
+            ["■","▲","●"],
+            ["▲","●","■"]
+        );
+
+    }
+
+    /* 2 */
+
+    else if(id===2){
+
+        desc.textContent=
+            "Resolva: 2 + 4 + 1";
+
+        inputPuzzle("7");
+
+    }
+
+    /* 3 */
+
+    else if(id===3){
+
+        desc.textContent=
+            "Clique: vermelho → azul → verde.";
+
+        colorsPuzzle();
+
+    }
+
+    /* 4 */
+
+    else if(id===4){
+
+        desc.textContent=
+            "Clique: 1 → 3 → 4 → 2.";
+
+        sequence(
+            [1,2,4,3],
+            [1,3,4,2]
+        );
+
+    }
+
+    /* 5 */
+
+    else if(id===5){
+
+        desc.textContent=
+            "Resolva: 7 × 3 + 2";
+
+        inputPuzzle("23");
+
+    }
+
+    /* 6 */
+
+    else if(id===6){
+
+        desc.textContent=
+            "Ligue os fusíveis: 1 → 2 → 3 → 4.";
+
+        sequence(
+            [3,1,4,2],
+            [1,2,3,4]
+        );
+
+    }
+
+    /* 7 */
+
+    else if(id===7){
+
+        desc.textContent=
+            "Qual é diferente?";
+
+        ["📕","📗","📘","🍎"].forEach(x=>{
+
+            const b=document.createElement("button");
+
+            b.textContent=x;
+            b.style.fontSize="40px";
+
+            b.onclick=()=>{
+
+                if(x==="🍎")
+                    solvePuzzle();
+                else
+                    showHint("Tente outra opção.");
+
+            };
+
+            area.appendChild(b);
+
+        });
+
+    }
+
+    /* 8 */
+
+    else if(id===8){
+
+        desc.textContent=
+            "Digite o código: 314";
+
+        inputPuzzle("314");
+
+    }
+
+    /* 9 */
+
+    else if(id===9){
+
+        desc.textContent=
+            "Encontre as duas estrelas.";
+
+        let count=0;
+
+        ["○","★","○","★","○"].forEach(x=>{
+
+            const b=document.createElement("button");
+
+            b.textContent=x;
+            b.style.fontSize="38px";
+
+            b.onclick=()=>{
+
+                if(x==="★"){
+
+                    if(!b.disabled){
+
+                        b.disabled=true;
+                        count++;
+
+                        if(count===2)
+                            solvePuzzle();
+
+                    }
+
+                }else{
+
+                    showHint("Essa não é.");
+
+                }
+
+            };
+
+            area.appendChild(b);
+
+        });
+
+    }
+
+    /* 10 */
+
+    else if(id===10){
+
+        desc.textContent=
+            "Complete: 2, 4, 6, 8, ?";
+
+        inputPuzzle("10");
+
+    }
+
+    /* 11 */
+
+    else if(id===11){
+
+        desc.textContent=
+            "03:00 + 5 horas = ?";
+
+        inputPuzzle("08");
+
+    }
+
+    /* 12 */
+
+    else if(id===12){
+
+        desc.textContent=
+            "Digite a palavra: LUZ";
+
+        inputPuzzle("LUZ");
+
+    }
+
+    /* 13 */
+
+    else if(id===13){
+
+        desc.textContent=
+            "Acenda as quatro luzes.";
+
+        let count=0;
+
+        for(let i=0;i<4;i++){
+
+            const b=document.createElement("button");
+
+            b.textContent="💡";
+            b.style.fontSize="40px";
+
+            b.onclick=()=>{
+
+                if(!b.dataset.on){
+
+                    b.dataset.on="1";
+                    b.style.background="#666";
+
+                    count++;
+
+                    if(count===4)
+                        solvePuzzle();
+
+                }
+
+            };
+
+            area.appendChild(b);
+
+        }
+
+    }
+
+    /* 14 */
+
+    else if(id===14){
+
+        desc.textContent=
+            "Qual chave abre a porta?";
+
+        ["🔑","🪙","🧲"].forEach(x=>{
+
+            const b=document.createElement("button");
+
+            b.textContent=x;
+            b.style.fontSize="40px";
+
+            b.onclick=()=>{
+
+                if(x==="🔑")
+                    solvePuzzle();
+                else
+                    showHint("Essa não.");
+
+            };
+
+            area.appendChild(b);
+
+        });
+
+    }
+
+    /* 15 */
+
+    else if(id===15){
+
+        desc.textContent=
+            "Resolva: 12 - 5 + 3";
+
+        inputPuzzle("10");
+
+    }
+
+    /* 16 */
+
+    else if(id===16){
+
+        desc.textContent=
+            "Qual número falta? 1, 2, 3, ?, 5";
+
+        inputPuzzle("4");
+
+    }
+
+    /* 17 */
+
+    else if(id===17){
+
+        desc.textContent=
+            "Ordem: 3 → 1 → 4 → 2.";
+
+        sequence(
+            [2,4,1,3],
+            [3,1,4,2]
+        );
+
+    }
+
+    /* 18 */
+
+    else if(id===18){
+
+        desc.textContent=
+            "Senha do computador: 2026";
+
+        inputPuzzle("2026");
+
+    }
+
+    /* 19 */
+
+    else if(id===19){
+
+        desc.textContent=
+            "Código do cofre: 8472";
+
+        inputPuzzle("8472");
+
+    }
+
+    /* 20 */
+
+    else if(id===20){
+
+        createJigsaw();
+
+    }
+
+}
+
+/* =====================================================
+   INPUT PUZZLE
+===================================================== */
+
+function inputPuzzle(correct){
+
+    const area=
+        document.getElementById("puzzleArea");
+
+    const input=
+        document.createElement("input");
+
+    input.className="input";
+    input.placeholder="Resposta";
+
+    const btn=
+        document.createElement("button");
+
+    btn.textContent="CONFIRMAR";
+
+    btn.onclick=()=>{
+
+        if(
+            input.value.trim().toUpperCase()===
+            correct.toUpperCase()
+        ){
+
+            solvePuzzle();
+
+        }else{
+
+            showHint("Resposta incorreta.");
+
+        }
+
+    };
+
+    area.appendChild(input);
+    area.appendChild(btn);
+
+}
+
+/* =====================================================
+   SEQUÊNCIA
+===================================================== */
+
+function sequence(values,correct){
+
+    const area=
+        document.getElementById("puzzleArea");
+
+    const box=
+        document.createElement("div");
+
+    box.className="sequence";
+
+    let position=0;
+
+    values.forEach(value=>{
+
+        const b=
+            document.createElement("button");
+
+        b.textContent=value;
+
+        b.onclick=()=>{
+
+            if(
+                String(value)===
+                String(correct[position])
+            ){
+
+                b.disabled=true;
+                position++;
+
+                if(position===correct.length)
+                    solvePuzzle();
+
+            }else{
+
+                position=0;
+
+                box.querySelectorAll("button")
+                    .forEach(x=>x.disabled=false);
+
+                showHint("Sequência errada.");
+
+            }
+
+        };
+
+        box.appendChild(b);
+
+    });
+
+    area.appendChild(box);
+
+}
+
+/* =====================================================
+   CORES
+===================================================== */
+
+function colorsPuzzle(){
+
+    const area=
+        document.getElementById("puzzleArea");
+
+    const colors=[
+        ["🔴","red"],
+        ["🔵","blue"],
+        ["🟢","green"]
+    ];
+
+    let position=0;
+
+    colors.forEach((c,i)=>{
+
+        const b=
+            document.createElement("button");
+
+        b.textContent=c[0];
+        b.style.fontSize="42px";
+
+        b.onclick=()=>{
+
+            if(i===position){
+
+                position++;
+
+                if(position===3)
+                    solvePuzzle();
+
+            }else{
+
+                position=0;
+
+                showHint("A sequência voltou ao início.");
+
+            }
+
+        };
+
+        area.appendChild(b);
+
+    });
+
+}
+
+/* =====================================================
+   QUEBRA-CABEÇA
+===================================================== */
+
+function createJigsaw(){
+
+    const desc=
+        document.getElementById("puzzleDescription");
+
+    desc.innerHTML=
+        "🧩 <b>COMO MONTAR:</b><br>"+
+        "Coloque as peças nesta ordem:<br>"+
+        "<b>🌲 | 🌲🏠 | 🌙</b><br>"+
+        "<b>🏠 | 🚪 | 🪟</b><br>"+
+        "<b>🌿 | 🪨 | ⭐</b><br>"+
+        "Toque em uma peça e depois em outra para trocar.";
+
+    const area=
+        document.getElementById("puzzleArea");
+
+    const help=
+        document.createElement("div");
+
+    help.className="jigsawHelp";
+
+    help.innerHTML=
+        "MODELO:<br>"+
+        "🌲 🌲🏠 🌙<br>"+
+        "🏠 🚪 🪟<br>"+
+        "🌿 🪨 ⭐";
+
+    area.appendChild(help);
+
+    const grid=
+        document.createElement("div");
+
+    grid.className="jigsaw";
+
+    const correct=[
+        "🌲",
+        "🌲🏠",
+        "🌙",
+        "🏠",
+        "🚪",
+        "🪟",
+        "🌿",
+        "🪨",
+        "⭐"
+    ];
+
+    let pieces=[...correct];
+
+    pieces.sort(()=>Math.random()-.5);
+
+    let selected=null;
+
+    pieces.forEach(piece=>{
+
+        const b=
+            document.createElement("button");
+
+        b.textContent=piece;
+
+        b.onclick=()=>{
+
+            if(!selected){
+
+                selected=b;
+
+                b.classList.add("selected");
+
+                return;
+
+            }
+
+            if(selected===b){
+
+                b.classList.remove("selected");
+                selected=null;
+
+                return;
+
+            }
+
+            const temp=
+                selected.textContent;
+
+            selected.textContent=
+                b.textContent;
+
+            b.textContent=temp;
+
+            selected.classList.remove("selected");
+
+            selected=null;
+
+            const current=
+                [...grid.children]
+                .map(x=>x.textContent);
+
+            if(
+                current.every(
+                    (x,i)=>x===correct[i]
+                )
+            ){
+
+                solvePuzzle();
+
+            }
+
+        };
+
+        grid.appendChild(b);
+
+    });
+
+    area.appendChild(grid);
+
+}
+
+/* =====================================================
+   RESOLVER
+===================================================== */
+
+function solvePuzzle(){
+
+    if(!currentPuzzle)return;
+
+    const p=currentPuzzle;
+
+    p.done=true;
+
+    if(p.main){
+
+        const reward=
+            TOOL_REWARDS[p.id];
+
+        if(
+            reward &&
+            !inventory.includes(reward)
+        ){
+
+            inventory.push(reward);
+
+        }
+
+        showMessage(
+            "🟠 PUZZLE PRINCIPAL COMPLETO!<br><br>"+
+            "Você recebeu:<br>"+
+            "<b>"+reward+"</b>"
+        );
+
+    }else{
+
+        blueStars++;
+
+        showMessage(
+            "🔵 PUZZLE SECUNDÁRIO COMPLETO!<br><br>"+
+            "🏆 Você ganhou uma estrela azul!"
+        );
+
+    }
+
+    updateInventory();
+
+    checkAllPuzzles();
+
+    closePuzzle();
+
+}
+
+/* =====================================================
+   SAÍDA
+===================================================== */
+
+function allPuzzlesDone(){
+
+    return puzzles.every(p=>p.done);
+
+}
+
+function tryExit(){
+
+    if(!allPuzzlesDone()){
+
+        const remaining=
+            puzzles.filter(p=>!p.done).length;
+
+        showMessage(
+            "🔴 A SAÍDA ESTÁ BLOQUEADA!<br><br>"+
+            "Ainda faltam <b>"+
+            remaining+
+            "</b> puzzles."
+        );
+
+        return;
+
+    }
+
+    winGame();
+
+}
+
+/* =====================================================
+   QUANDO TODOS TERMINAM
+===================================================== */
+
+function checkAllPuzzles(){
+
+    if(allPuzzlesDone()){
+
+        if(!gameFinishedAchievement){
+
+            gameFinishedAchievement=true;
+
+            stars++;
+
+            updateMenuStars();
+
+        }
+
+    }
+
+}
+
+let gameFinishedAchievement=false;
+
+/* =====================================================
+   VITÓRIA
+===================================================== */
+
+function winGame(){
+
+    gameStarted=false;
+
+    stars++;
+
+    updateMenuStars();
+
+    document.getElementById("gameOver")
+        .style.display="flex";
+
+    document.getElementById("gameOverTitle")
+        .textContent="VOCÊ ESCAPOU!";
+
+    document.getElementById("gameOverText")
+        .textContent=
+        "Todos os puzzles foram concluídos. ⭐ Você ganhou uma estrela!";
+
+}
+
+/* =====================================================
+   TEMPO
+===================================================== */
+
+function updateTime(){
+
+    if(!gameStarted)return;
+
+    gameTime+=1/60;
+
+    if(gameTime>=GAME_TIME){
+
+        loseGame();
+
+    }
+
+    const remaining=
+        Math.max(0,GAME_TIME-gameTime);
+
+    const minutes=
+        Math.floor(remaining/60);
+
+    const seconds=
+        Math.floor(remaining%60);
+
+    document.getElementById("timerText")
+        .textContent=
+        String(minutes).padStart(2,"0")+
+        ":"+
+        String(seconds).padStart(2,"0");
+
+    document.getElementById("timeBar")
+        .style.width=
+        (remaining/GAME_TIME*100)+"%";
+
+}
+
+/* =====================================================
+   INVENTÁRIO
+===================================================== */
+
+function updateInventory(){
+
+    const el=
+        document.getElementById("inventory");
+
+    if(inventory.length===0){
+
+        el.innerHTML=
+            "Inventário:<br>— vazio";
+
+        return;
+
+    }
+
+    el.innerHTML=
+        "<b>Itens:</b><br>"+
+        inventory
+            .map(x=>"• "+x)
+            .join("<br>");
+
+}
+
+/* =====================================================
+   MINI MAPA
+===================================================== */
+
+function drawMiniMap(){
+
+    const w=miniCanvas.width;
+    const h=miniCanvas.height;
+
+    miniCtx.clearRect(0,0,w,h);
+
+    miniCtx.fillStyle="#090909";
+    miniCtx.fillRect(0,0,w,h);
+
+    const sx=w/WORLD_W;
+    const sy=h/WORLD_H;
+
+    rooms.forEach(room=>{
+
+        miniCtx.strokeStyle="#555";
+        miniCtx.strokeRect(
+            room.x*sx,
+            room.y*sy,
+            room.w*sx,
+            room.h*sy
+        );
+
+    });
+
+    /* PUZZLES */
+
+    puzzles.forEach(p=>{
+
+        miniCtx.beginPath();
+
+        miniCtx.arc(
+            p.x*sx,
+            p.y*sy,
+            p.main?5:3,
+            0,
+            Math.PI*2
+        );
+
+        if(p.main){
+
+            miniCtx.fillStyle="#ff8a00";
+
+        }else{
+
+            miniCtx.fillStyle="#168cff";
+
+        }
+
+        miniCtx.fill();
+
+    });
+
+    /* SAÍDA VERMELHA */
+
+    miniCtx.fillStyle="red";
+
+    miniCtx.fillRect(
+        11200*sx-5,
+        3000*sy-5,
+        10,
+        10
+    );
+
+    /* JOGADOR */
+
+    miniCtx.fillStyle="white";
+
+    miniCtx.beginPath();
+
+    miniCtx.arc(
+        player.x*sx,
+        player.y*sy,
+        4,
+        0,
+        Math.PI*2
+    );
+
+    miniCtx.fill();
+
+}
+
+/* =====================================================
+   DESENHAR MUNDO
+===================================================== */
+
+function draw(){
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    ctx.save();
+
+    ctx.translate(
+        -camera.x,
+        -camera.y
+    );
+
+    ctx.fillStyle="#101010";
+
+    ctx.fillRect(
+        0,
+        0,
+        WORLD_W,
+        WORLD_H
+    );
+
+    /* SALAS */
+
+    rooms.forEach(room=>{
+
+        ctx.fillStyle="#252525";
+
+        ctx.fillRect(
+            room.x,
+            room.y,
+            room.w,
+            room.h
+        );
+
+        ctx.strokeStyle="#555";
+        ctx.lineWidth=5;
+
+        ctx.strokeRect(
+            room.x,
+            room.y,
+            room.w,
+            room.h
+        );
+
+        ctx.fillStyle="#777";
+        ctx.font="20px Arial";
+
+        ctx.fillText(
+            room.name,
+            room.x+15,
+            room.y+30
+        );
+
+    });
+
+    /* PUZZLES */
+
+    puzzles.forEach(p=>{
+
+        ctx.fillStyle=
+            p.done
+            ? "#3b743e"
+            : p.main
+                ? "#ff8a00"
+                : "#168cff";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            p.x,
+            p.y,
+            24,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+        ctx.fillStyle="#fff";
+        ctx.font="bold 13px Arial";
+
+        ctx.fillText(
+            p.id,
+            p.x-5,
+            p.y+5
+        );
+
+    });
+
+    /* SAÍDA */
+
+    ctx.fillStyle="#600";
+
+    ctx.fillRect(
+        11165,
+        2925,
+        70,
+        150
+    );
+
+    ctx.fillStyle="red";
+
+    ctx.fillRect(
+        11170,
+        2930,
+        60,
+        140
+    );
+
+    ctx.fillStyle="#fff";
+    ctx.font="bold 16px Arial";
+
+    ctx.fillText(
+        "SAÍDA",
+        11175,
+        2910
+    );
+
+    /* JOGADOR */
+
+    ctx.fillStyle="#ddd";
+
+    ctx.fillRect(
+        player.x-14,
+        player.y-5,
+        28,
+        35
+    );
+
+    ctx.beginPath();
+
+    ctx.arc(
+        player.x,
+        player.y-20,
+        14,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+    ctx.fillStyle="#111";
+
+    ctx.fillRect(
+        player.x-6,
+        player.y-23,
+        4,
+        4
+    );
+
+    ctx.fillRect(
+        player.x+2,
+        player.y-23,
+        4,
+        4
+    );
+
+    ctx.restore();
+
+}
+
+/* =====================================================
+   MENSAGENS
+===================================================== */
+
+function showMessage(text){
+
+    document.getElementById("messageText")
+        .innerHTML=text;
+
+    document.getElementById("message")
+        .style.display="flex";
+
+}
+
+function closeMessage(){
+
+    document.getElementById("message")
+        .style.display="none";
+
+}
+
+/* =====================================================
+   PUZZLE FECHAR
+===================================================== */
+
+function closePuzzle(){
+
+    document.getElementById("puzzleOverlay")
+        .style.display="none";
+
+    currentPuzzle=null;
+
+}
+
+/* =====================================================
+   HINT
+===================================================== */
+
+function showHint(text){
+
+    const h=
+        document.getElementById("hint");
+
+    h.textContent=text;
+    h.style.display="block";
+
+    clearTimeout(h.timer);
+
+    h.timer=setTimeout(()=>{
+
+        h.style.display="none";
+
+    },1800);
+
+}
+
+/* =====================================================
+   GAME OVER
+===================================================== */
+
+function loseGame(){
+
+    gameStarted=false;
+
+    stopJoystick();
+
+    document.getElementById("gameOver")
+        .style.display="flex";
+
+    document.getElementById("gameOverTitle")
+        .textContent="TEMPO ESGOTADO";
+
+    document.getElementById("gameOverText")
+        .textContent=
+        "Os 21 minutos acabaram.";
+
+}
+
+function restartGame(){
+
+    document.getElementById("gameOver")
+        .style.display="none";
+
+    startGame();
+
+}
+
+function backMenu(){
+
+    gameStarted=false;
+
+    stopJoystick();
+
+    document.getElementById("gameOver")
+        .style.display="none";
+
+    document.getElementById("game")
+        .style.display="none";
+
+    document.getElementById("menu")
+        .style.display="flex";
+
+    updateMenuStars();
+
+}
+
+/* =====================================================
+   LOOP
+===================================================== */
+
+function loop(){
+
+    updateMovement();
+
+    updateCamera();
+
+    checkNearby();
+
+    updateTime();
+
+    draw();
+
+    drawMiniMap();
+
+    requestAnimationFrame(loop);
+
+}
+
+updateMenuStars();
+
+loop();
+
+</script>
+
+</body>
+</html>
